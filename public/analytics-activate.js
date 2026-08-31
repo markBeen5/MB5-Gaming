@@ -1,0 +1,1 @@
+(()=>{if(document.querySelector('script[data-mb5-analytics]'))return;const s=document.createElement('script');s.src='analytics-loader.js?v=20260831-1';s.defer=true;s.dataset.mb5Analytics='1';document.head.appendChild(s)})();
