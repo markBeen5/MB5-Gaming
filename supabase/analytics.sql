@@ -1,0 +1,3 @@
+-- MB5 analytics schema is deployed in Supabase via migration add_mb5_analytics.
+-- Table: public.analytics_events
+-- RLS: public insert for allowlisted anonymous events; authenticated owner/admin read only via public.is_admin().
