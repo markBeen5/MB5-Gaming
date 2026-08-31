@@ -1,0 +1,1 @@
+MB5 Analytics assets are deployed. Activation requires analytics-loader.js to be loaded after config.js on index.html and admin.html (or from config.js).
