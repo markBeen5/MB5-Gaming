@@ -1,0 +1,1 @@
+Analytics DB: public.analytics_events. Public clients may insert allowlisted event types only. Reads are owner/admin only through public.is_admin(). Frontend assets: analytics.js, admin-analytics.js/css, analytics-loader.js. Activation is performed by config.js loader.
