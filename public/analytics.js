@@ -5,7 +5,7 @@
   const sid=(()=>{try{let v=sessionStorage.getItem('mb5_sid');if(!v){v=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));sessionStorage.setItem('mb5_sid',v)}return v}catch{return null}})();
   const device=()=>{const w=innerWidth;return w<768?'mobile':w<1100?'tablet':'desktop'};
   const ref=()=>{try{return document.referrer?new URL(document.referrer).hostname:null}catch{return null}};
-  const send=(event_name,section=null)=>s.from('analytics_events').insert({event_name,path:location.pathname,section,referrer_host:ref(),device_type:device(),session_id:sid}).then(()=>{}).catch(()=>{});
+  const send=(event_name,section=null)=>s.rpc('record_analytics_event',{p_event_name:event_name,p_path:location.pathname,p_section:section,p_referrer_host:ref(),p_device_type:device(),p_session_id:sid}).then(()=>{}).catch(()=>{});
   send('page_view');
   const seen=new Set();
   if('IntersectionObserver'in window){
