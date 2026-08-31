@@ -1,1 +1,2 @@
 window.MARKBEEN5_CONFIG={SUPABASE_URL:'https://wifkhdvmuiioisetzqfr.supabase.co',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_Ot-bQ77UbU-tjFs4WLg1mQ_PudPu9DP'};
+if(/admin\.html$/i.test(location.pathname)){const l=document.createElement('link');l.rel='stylesheet';l.href='admin-enhance.css?v=20260831-adminhq1';document.head.appendChild(l);const j=document.createElement('script');j.src='admin-enhance.js?v=20260831-adminhq1';j.defer=true;document.head.appendChild(j);}
