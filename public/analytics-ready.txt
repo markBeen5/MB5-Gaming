@@ -1,0 +1,1 @@
+MB5 analytics assets ready for config loader activation.
