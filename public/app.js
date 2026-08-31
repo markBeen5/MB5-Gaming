@@ -13,19 +13,31 @@ function viewsLabel(n){n=Number(n||0);if(n>=1000000)return `${(n/1000000).toFixe
 function videoCard(v,badge='VIDEO'){let sn=v.snippet||{},thumb=sn.thumbnails?.high?.url||sn.thumbnails?.medium?.url||sn.thumbnails?.default?.url||'',seconds=isoSeconds(v.contentDetails?.duration),date=sn.publishedAt?new Date(sn.publishedAt).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'';return `<a class="youtube-card" href="https://www.youtube.com/watch?v=${encodeURIComponent(v.id)}" target="_blank" rel="noopener"><div class="thumb-wrap"><img src="${esc(thumb)}" alt="${esc(sn.title||'YouTube video')}" loading="lazy"><span class="video-badge">${esc(badge)}</span><span class="duration">${durationLabel(seconds)}</span></div><div class="video-info"><h3>${esc(sn.title||'Untitled video')}</h3><p>${viewsLabel(v.statistics?.viewCount)}${date?` • ${esc(date)}`:''}</p></div></a>`}
 function manualClipCards(clips){return clips.map(x=>`<a class="youtube-card" href="${esc(x.url)}" target="_blank" rel="noopener"><div class="video-info"><span class="video-badge inline">CLIP</span><h3>${esc(x.title)}</h3><p>${esc(x.description||'')}</p></div></a>`).join('')}
 
+async function fetchJson(url,timeoutMs=10000){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),timeoutMs);
+ try{
+  const res=await fetch(url,{signal:controller.signal});
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.error?.message||`Request failed (${res.status})`);
+  return data;
+ }catch(err){
+  if(err.name==='AbortError')throw new Error('YouTube took too long to respond. Please refresh the page.');
+  throw err;
+ }finally{clearTimeout(timer)}
+}
+
 async function loadYouTube(manualClips=[]){
  const videoGrid=document.querySelector('#videoGrid'),clipGrid=document.querySelector('#clipGrid');
+ if(!videoGrid||!clipGrid)return;
  if(!c.YOUTUBE_API_KEY){videoGrid.innerHTML='<article class="video-status">YouTube feed is not configured yet.</article>';clipGrid.innerHTML=manualClips.length?manualClipCards(manualClips):'<article class="video-status">No clips yet.</article>';return}
  try{
   const key=encodeURIComponent(c.YOUTUBE_API_KEY);
-  const chRes=await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails,snippet&forHandle=markBeen5&key=${key}`);
-  const ch=await chRes.json();if(!chRes.ok)throw new Error(ch.error?.message||'YouTube channel lookup failed');
+  const ch=await fetchJson(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails,snippet&forHandle=markBeen5&key=${key}`);
   const channel=ch.items?.[0],uploads=channel?.contentDetails?.relatedPlaylists?.uploads;if(!uploads)throw new Error('YouTube uploads playlist was not found');
-  const plRes=await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,snippet&playlistId=${encodeURIComponent(uploads)}&maxResults=24&key=${key}`);
-  const pl=await plRes.json();if(!plRes.ok)throw new Error(pl.error?.message||'YouTube uploads request failed');
+  const pl=await fetchJson(`https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,snippet&playlistId=${encodeURIComponent(uploads)}&maxResults=24&key=${key}`);
   const ids=(pl.items||[]).map(x=>x.contentDetails?.videoId).filter(Boolean);if(!ids.length)throw new Error('No YouTube uploads found');
-  const vRes=await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${encodeURIComponent(ids.join(','))}&key=${key}`);
-  const vd=await vRes.json();if(!vRes.ok)throw new Error(vd.error?.message||'YouTube video details request failed');
+  const vd=await fetchJson(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${encodeURIComponent(ids.join(','))}&key=${key}`);
   const byId=new Map((vd.items||[]).map(v=>[v.id,v]));const ordered=ids.map(id=>byId.get(id)).filter(Boolean);
   const shorts=ordered.filter(v=>isoSeconds(v.contentDetails?.duration)<=180).slice(0,6);
   let videos=ordered.filter(v=>isoSeconds(v.contentDetails?.duration)>180).slice(0,6);if(!videos.length)videos=ordered.slice(0,6);
@@ -34,7 +46,9 @@ async function loadYouTube(manualClips=[]){
  }catch(err){console.error('YouTube feed error:',err);videoGrid.innerHTML=`<article class="video-status"><h3>YouTube feed unavailable</h3><p>${esc(err.message||'Please try again shortly.')}</p><a class="btn" href="https://www.youtube.com/@markBeen5" target="_blank" rel="noopener">OPEN YOUTUBE</a></article>`;clipGrid.innerHTML=manualClips.length?manualClipCards(manualClips):'<article class="video-status">Clips will appear here when the YouTube feed is available.</article>'}
 }
 
-async function boot(){let [site,live,clips,plays,schedule,stats,social]=await Promise.all(['site_settings','live_status','clips','plays','schedule','stats','social_links'].map(rows));site=site[0];live=live[0];stats=stats[0];document.querySelector('#tagline').textContent=site.tagline;paintLive(live);let tw=social.find(x=>x.platform==='Twitch')||fb.social[0],yt=social.find(x=>x.platform==='YouTube')||fb.social[4];document.querySelector('#twitch').href=tw.url;document.querySelector('#youtube').href=yt.url;document.querySelector('#chat').onclick=()=>window.open('https://www.twitch.tv/popout/markbeen5/chat','_blank','width=420,height=700');loadYouTube(clips);window.plays=plays;render('All');document.querySelector('#scheduleGrid').innerHTML=schedule.map(x=>`<div class="schedule"><b>${x.day}</b><span>${x.time}</span></div>`).join('');let total=Number(stats.wins||0)+Number(stats.losses||0),pct=total?((Number(stats.wins||0)/total)*100).toFixed(1):'0.0';document.querySelector('#stats').innerHTML=`<div class="stat"><b>${stats.wins}</b>WINS</div><div class="stat"><b>${stats.losses}</b>LOSSES</div><div class="stat"><b>${pct}%</b>WIN RATE</div><div class="stat"><b>${stats.streak}</b>STREAK</div>`;document.querySelector('#social').innerHTML=social.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.platform)} — ${esc(x.handle)}</a>`).join('');setInterval(refreshLive,60000)}
+async function boot(){let [site,live,clips,plays,schedule,stats,social]=await Promise.all(['site_settings','live_status','clips','plays','schedule','stats','social_links'].map(rows));site=site[0];live=live[0];stats=stats[0];document.querySelector('#tagline').textContent=site.tagline;paintLive(live);let tw=social.find(x=>x.platform==='Twitch')||fb.social[0],yt=social.find(x=>x.platform==='YouTube')||fb.social[4];document.querySelector('#twitch').href=tw.url;document.querySelector('#youtube').href=yt.url;document.querySelector('#chat').onclick=()=>window.open('https://www.twitch.tv/popout/markbeen5/chat','_blank','width=420,height=700');window.plays=plays;render('All');document.querySelector('#scheduleGrid').innerHTML=schedule.map(x=>`<div class="schedule"><b>${x.day}</b><span>${x.time}</span></div>`).join('');let total=Number(stats.wins||0)+Number(stats.losses||0),pct=total?((Number(stats.wins||0)/total)*100).toFixed(1):'0.0';document.querySelector('#stats').innerHTML=`<div class="stat"><b>${stats.wins}</b>WINS</div><div class="stat"><b>${stats.losses}</b>LOSSES</div><div class="stat"><b>${pct}%</b>WIN RATE</div><div class="stat"><b>${stats.streak}</b>STREAK</div>`;document.querySelector('#social').innerHTML=social.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.platform)} — ${esc(x.handle)}</a>`).join('');setInterval(refreshLive,60000)}
 function render(f){document.querySelector('#playGrid').innerHTML=window.plays.filter(x=>f==='All'||x.type===f||x.coverage===f).map(x=>`<div class="play"><b>${esc(x.name)}</b><p>${esc(x.type)} • Best vs ${esc(x.coverage)}<br>${esc(x.detail||'')}</p></div>`).join('')}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-f]');if(b){document.querySelectorAll('[data-f]').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.f)}});
-boot();
+
+loadYouTube([]);
+boot().catch(err=>console.error('Site boot error:',err));
