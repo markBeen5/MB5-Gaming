@@ -22,13 +22,14 @@ window.MARKBEEN5_CONFIG = {
 
   if (admin) {
     css('admin-enhance.css?v=20260831-1');
-    css('admin-mobile.css?v=20260901-1');
+    css('admin-mobile.css?v=20260901-2');
     js('admin-enhance.js?v=20260831-1');
     js('admin-community.js?v=20260831-1');
     js('admin-news.js?v=20260901-1');
     js('admin-gta6.js?v=20260901-1');
     js('admin-fixes.js?v=20260831-final1');
-    js('admin-game-results.js?v=20260901-2');
+    js('game-result-scan.js?v=20260901-1');
+    js('admin-game-results.js?v=20260901-3');
   } else {
     css('qa.css?v=20260831-1');
     css('mobile-final.css?v=20260901-3');
