@@ -1,0 +1,1 @@
+(()=>{function add(){const nav=document.querySelector('.nav-links');if(!nav||nav.querySelector('a[href="news.html"]'))return;const a=document.createElement('a');a.href='news.html';a.textContent='NEWS';const admin=nav.querySelector('.admin-link');nav.insertBefore(a,admin||null)}document.addEventListener('DOMContentLoaded',add);setTimeout(add,500)})();
