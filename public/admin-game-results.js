@@ -1,82 +1,47 @@
 (()=>{
   const cfg=window.MARKBEEN5_CONFIG||{};
   if(!cfg.SUPABASE_URL||!cfg.SUPABASE_PUBLISHABLE_KEY||!window.supabase)return;
-  const db=supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY);
-  const $=id=>document.getElementById(id);
+  const db=supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY),$=id=>document.getElementById(id);
   const esc=(v='')=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+  let editingId=null,saving=false;
+
   function notify(msg,bad=false){if(typeof window.toast==='function')return window.toast(msg,bad);const el=document.createElement('div');el.textContent=msg;el.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:999;background:#0c1b28;color:#fff;border:1px solid '+(bad?'#7a2834':'#245072')+';padding:12px 16px;border-radius:10px';document.body.appendChild(el);setTimeout(()=>el.remove(),2500)}
+  function localDateValue(value=new Date()){const date=new Date(value);date.setMinutes(date.getMinutes()-date.getTimezoneOffset());return date.toISOString().slice(0,16)}
+  function resetForm(){editingId=null;$('grOpponent').value='';$('grPF').value='';$('grPA').value='';$('grNotes').value='';$('grDate').value=localDateValue();$('grAdd').textContent='ADD RESULT';$('grCancel').classList.add('hidden')}
 
   function installUI(){
-    const tabs=$('tabs'),statsPanel=$('stats');
-    if(!tabs||!statsPanel||$('results'))return;
+    const tabs=$('tabs'),statsPanel=$('stats');if(!tabs||!statsPanel||$('results'))return;
     const tab=document.createElement('button');tab.dataset.tab='results';tab.textContent='RESULTS';tabs.insertBefore(tab,tabs.querySelector('[data-tab="plays"]'));
-    const panel=document.createElement('div');panel.id='results';panel.className='panel';
-    panel.innerHTML=`<div class="box"><h2>GAME RESULT TRACKER <span class="count" id="resultsCount">0</span></h2><p class="hint">Your existing record is kept as the historical baseline. Every result added here automatically updates the public wins and losses.</p><div class="grid3"><div class="field"><label>Result</label><select id="grResult"><option value="W">WIN</option><option value="L">LOSS</option></select></div><div class="field"><label>Opponent</label><input id="grOpponent" placeholder="Opponent / gamertag"></div><div class="field"><label>Date</label><input id="grDate" type="datetime-local"></div></div><div class="grid3"><div class="field"><label>Your score</label><input id="grPF" type="number" min="0"></div><div class="field"><label>Opponent score</label><input id="grPA" type="number" min="0"></div><div class="field"><label>Mode</label><input id="grMode" value="Online H2H"></div></div><div class="grid"><div class="field"><label>Game</label><input id="grGame" value="Madden 27"></div><div class="field"><label>Team</label><input id="grTeam" value="Detroit Lions"></div></div><div class="field"><label>Notes</label><textarea id="grNotes" placeholder="Key plays, adjustments, comeback, etc."></textarea></div><div class="form-actions"><button class="btn" id="grAdd">ADD RESULT</button><button class="ghost" id="grRefresh">REFRESH</button></div><div class="status-grid" style="margin-top:14px"><div class="status"><b>HISTORICAL</b><strong id="grBase">—</strong></div><div class="status"><b>TRACKED</b><strong id="grTracked">—</strong></div><div class="status"><b>TOTAL RECORD</b><strong id="grTotal">—</strong></div><div class="status"><b>WIN RATE</b><strong id="grPct">—</strong></div></div><div id="grList" class="list"></div></div>`;
-    statsPanel.after(panel);
-
-    if(!$('grDate').value){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('grDate').value=d.toISOString().slice(0,16)}
-    $('grAdd').addEventListener('click',addResult);
-    $('grRefresh').addEventListener('click',loadResults);
-
-    const saveStatsBtn=statsPanel.querySelector('button.btn');
-    if(saveStatsBtn){
-      const wins=$('wins'),losses=$('losses');
-      if(wins)wins.readOnly=true;if(losses)losses.readOnly=true;
-      saveStatsBtn.textContent='SAVE STREAK';
-      saveStatsBtn.onclick=saveStreakOnly;
-      const h=document.createElement('p');h.className='hint';h.textContent='Wins and losses are calculated automatically from your historical baseline plus the Game Result Tracker.';saveStatsBtn.before(h);
-    }
-
-    tabs.addEventListener('click',e=>{const b=e.target.closest('[data-tab="results"]');if(b)setTimeout(loadResults,0)});
-    loadResults();
+    const panel=document.createElement('div');panel.id='results';panel.className='panel';panel.innerHTML=`<div class="box"><h2>GAME RESULT TRACKER <span class="count" id="resultsCount">0</span></h2><p class="hint">Add each completed game once. Wins, losses, win rate and streak update automatically.</p><div class="grid3"><div class="field"><label for="grResult">Result</label><select id="grResult"><option value="W">WIN</option><option value="L">LOSS</option></select></div><div class="field"><label for="grOpponent">Opponent *</label><input id="grOpponent" required autocomplete="off" placeholder="Opponent / gamertag"></div><div class="field"><label for="grDate">Date</label><input id="grDate" type="datetime-local"></div></div><div class="grid3"><div class="field"><label for="grPF">Your score</label><input id="grPF" type="number" min="0" inputmode="numeric"></div><div class="field"><label for="grPA">Opponent score</label><input id="grPA" type="number" min="0" inputmode="numeric"></div><div class="field"><label for="grMode">Mode</label><input id="grMode" value="Online H2H"></div></div><div class="grid"><div class="field"><label for="grGame">Game</label><input id="grGame" value="Madden 27"></div><div class="field"><label for="grTeam">Team</label><input id="grTeam" value="Detroit Lions"></div></div><div class="field"><label for="grNotes">Notes</label><textarea id="grNotes" placeholder="Key plays, adjustments, comeback, etc."></textarea></div><div class="form-actions"><button class="btn" id="grAdd">ADD RESULT</button><button class="ghost hidden" id="grCancel">CANCEL EDIT</button><button class="ghost" id="grRefresh">REFRESH</button></div><div class="status-grid" style="margin-top:14px"><div class="status"><b>HISTORICAL</b><strong id="grBase">—</strong></div><div class="status"><b>TRACKED</b><strong id="grTracked">—</strong></div><div class="status"><b>TOTAL RECORD</b><strong id="grTotal">—</strong></div><div class="status"><b>CURRENT STREAK</b><strong id="grStreak">—</strong></div><div class="status"><b>WIN RATE</b><strong id="grPct">—</strong></div></div><div id="grList" class="list"></div></div>`;
+    statsPanel.after(panel);$('grDate').value=localDateValue();$('grAdd').addEventListener('click',saveResult);$('grCancel').addEventListener('click',resetForm);$('grRefresh').addEventListener('click',loadResults);
+    ['wins','losses','streak'].forEach(id=>{if($(id))$(id).readOnly=true});const saveStatsBtn=statsPanel.querySelector('button.btn');if(saveStatsBtn){saveStatsBtn.classList.add('hidden');const hint=document.createElement('p');hint.className='hint';hint.textContent='Record and streak are controlled by the Game Result Tracker.';saveStatsBtn.before(hint)}
+    tabs.addEventListener('click',event=>{if(event.target.closest('[data-tab="results"]'))setTimeout(loadResults,0)});loadResults();
   }
 
-  async function saveStreakOnly(){
-    const {data,error}=await db.from('stats').select('id').limit(1).maybeSingle();
-    if(error||!data)return notify(error?.message||'Stats record not found',true);
-    const r=await db.from('stats').update({streak:($('streak')?.value||'').trim()||'W0'}).eq('id',data.id);
-    if(r.error)return notify(r.error.message,true);notify('Streak saved');
+  function formRow(){
+    const result=$('grResult').value,opponent=$('grOpponent').value.trim(),pf=$('grPF').value===''?null:Number($('grPF').value),pa=$('grPA').value===''?null:Number($('grPA').value);
+    if(!opponent)throw new Error('Opponent is required');if((pf===null)!==(pa===null))throw new Error('Enter both scores or leave both blank');if(pf!==null&&result==='W'&&pf<=pa)throw new Error('A win needs your score to be higher');if(pf!==null&&result==='L'&&pf>=pa)throw new Error('A loss needs your score to be lower');
+    return{result,opponent,played_at:$('grDate').value?new Date($('grDate').value).toISOString():new Date().toISOString(),points_for:pf,points_against:pa,mode:$('grMode').value.trim()||'Online H2H',game:$('grGame').value.trim()||'Madden 27',team:$('grTeam').value.trim()||'Detroit Lions',notes:$('grNotes').value.trim()||null};
   }
 
-  async function addResult(){
-    const result=$('grResult').value;
-    const pf=$('grPF').value===''?null:Number($('grPF').value),pa=$('grPA').value===''?null:Number($('grPA').value);
-    const played=$('grDate').value?new Date($('grDate').value).toISOString():new Date().toISOString();
-    const row={result,opponent:$('grOpponent').value.trim()||null,played_at:played,points_for:pf,points_against:pa,mode:$('grMode').value.trim()||'Online H2H',game:$('grGame').value.trim()||'Madden 27',team:$('grTeam').value.trim()||'Detroit Lions',notes:$('grNotes').value.trim()||null};
-    const {error}=await db.from('game_results').insert(row);
-    if(error)return notify(error.message,true);
-    $('grOpponent').value='';$('grPF').value='';$('grPA').value='';$('grNotes').value='';notify(result==='W'?'Win added — stats updated':'Loss added — stats updated');await loadResults();await refreshStatsFields();
+  async function saveResult(){
+    if(saving)return;let row;try{row=formRow()}catch(error){return notify(error.message,true)}saving=true;$('grAdd').disabled=true;$('grAdd').textContent=editingId?'SAVING…':'ADDING…';
+    const response=editingId?await db.from('game_results').update(row).eq('id',editingId):await db.from('game_results').insert(row);saving=false;$('grAdd').disabled=false;
+    if(response.error){$('grAdd').textContent=editingId?'SAVE RESULT':'ADD RESULT';return notify(response.error.code==='23505'?'That result is already saved':response.error.message,true)}
+    notify(editingId?'Result updated — stats synchronized':row.result==='W'?'Win added — stats synchronized':'Loss added — stats synchronized');resetForm();await loadResults();
   }
 
-  async function removeResult(id){
-    if(!confirm('Delete this game result? Your totals will update automatically.'))return;
-    const {error}=await db.from('game_results').delete().eq('id',id);if(error)return notify(error.message,true);notify('Result deleted — stats updated');await loadResults();await refreshStatsFields();
-  }
-
-  async function refreshStatsFields(){
-    const {data}=await db.from('stats').select('wins,losses,streak').limit(1).maybeSingle();
-    if(data){if($('wins'))$('wins').value=data.wins??0;if($('losses'))$('losses').value=data.losses??0;if($('streak'))$('streak').value=data.streak||''}
-  }
+  function editResult(game){editingId=game.id;$('grResult').value=game.result;$('grOpponent').value=game.opponent||'';$('grDate').value=localDateValue(game.played_at);$('grPF').value=game.points_for??'';$('grPA').value=game.points_against??'';$('grMode').value=game.mode||'Online H2H';$('grGame').value=game.game||'Madden 27';$('grTeam').value=game.team||'Detroit Lions';$('grNotes').value=game.notes||'';$('grAdd').textContent='SAVE RESULT';$('grCancel').classList.remove('hidden');$('grOpponent').focus();$('results').scrollIntoView({behavior:'smooth',block:'start'})}
+  async function removeResult(id){if(!confirm('Delete this game result? Your record and streak will update automatically.'))return;const{error}=await db.from('game_results').delete().eq('id',id);if(error)return notify(error.message,true);if(editingId===id)resetForm();notify('Result deleted — stats synchronized');await loadResults()}
+  async function refreshStatsFields(){const{data}=await db.from('stats').select('wins,losses,streak').limit(1).maybeSingle();if(data){if($('wins'))$('wins').value=data.wins??0;if($('losses'))$('losses').value=data.losses??0;if($('streak'))$('streak').value=data.streak||'W0'}return data||{wins:0,losses:0,streak:'W0'}}
 
   async function loadResults(){
-    const [baseRes,gamesRes,statsRes]=await Promise.all([
-      db.from('game_result_baseline').select('wins,losses').eq('id',true).maybeSingle(),
-      db.from('game_results').select('*').order('played_at',{ascending:false}).limit(100),
-      db.from('stats').select('wins,losses').limit(1).maybeSingle()
-    ]);
-    if(baseRes.error||gamesRes.error||statsRes.error)return notify((baseRes.error||gamesRes.error||statsRes.error).message,true);
-    const base=baseRes.data||{wins:0,losses:0},games=gamesRes.data||[],stats=statsRes.data||{wins:0,losses:0};
-    const tw=games.filter(x=>x.result==='W').length,tl=games.filter(x=>x.result==='L').length,total=Number(stats.wins||0)+Number(stats.losses||0),pct=total?((Number(stats.wins||0)/total)*100).toFixed(1):'0.0';
-    if($('resultsCount'))$('resultsCount').textContent=games.length;
-    if($('grBase'))$('grBase').textContent=`${base.wins}-${base.losses}`;
-    if($('grTracked'))$('grTracked').textContent=`${tw}-${tl}`;
-    if($('grTotal'))$('grTotal').textContent=`${stats.wins}-${stats.losses}`;
-    if($('grPct'))$('grPct').textContent=`${pct}%`;
-    if($('grList'))$('grList').innerHTML=games.length?games.map(g=>`<div class="item"><div><div class="item-title">${g.result==='W'?'✅ WIN':'❌ LOSS'}${g.opponent?` vs ${esc(g.opponent)}`:''}${g.points_for!=null&&g.points_against!=null?` • ${g.points_for}-${g.points_against}`:''}</div><div class="item-sub">${esc(g.game||'Madden 27')} • ${esc(g.team||'Detroit Lions')} • ${esc(g.mode||'Online H2H')} • ${new Date(g.played_at).toLocaleString()}${g.notes?`<br>${esc(g.notes)}`:''}</div></div><div class="item-actions"><button class="danger" data-delete-result="${g.id}">DELETE</button></div></div>`).join(''):'<div class="hint">No tracked games yet. Your historical record remains counted.</div>';
-    document.querySelectorAll('[data-delete-result]').forEach(b=>b.onclick=()=>removeResult(b.dataset.deleteResult));
-    await refreshStatsFields();
+    const[baseRes,gamesRes,statsRes]=await Promise.all([db.from('game_result_baseline').select('wins,losses,streak').eq('id',true).maybeSingle(),db.from('game_results').select('*').order('played_at',{ascending:false}).order('created_at',{ascending:false}).limit(100),db.from('stats').select('wins,losses,streak').limit(1).maybeSingle()]);if(baseRes.error||gamesRes.error||statsRes.error)return notify((baseRes.error||gamesRes.error||statsRes.error).message,true);
+    const base=baseRes.data||{wins:0,losses:0,streak:'W0'},games=gamesRes.data||[],stats=statsRes.data||{wins:0,losses:0,streak:'W0'},trackedWins=games.filter(game=>game.result==='W').length,trackedLosses=games.filter(game=>game.result==='L').length,total=Number(stats.wins||0)+Number(stats.losses||0),pct=total?((Number(stats.wins||0)/total)*100).toFixed(1):'0.0';
+    $('resultsCount').textContent=games.length;$('grBase').textContent=`${base.wins}-${base.losses}`;$('grTracked').textContent=`${trackedWins}-${trackedLosses}`;$('grTotal').textContent=`${stats.wins}-${stats.losses}`;$('grStreak').textContent=stats.streak||'W0';$('grPct').textContent=`${pct}%`;
+    $('grList').innerHTML=games.length?games.map(game=>`<div class="item"><div><div class="item-title">${game.result==='W'?'✅ WIN':'❌ LOSS'} vs ${esc(game.opponent)}${game.points_for!=null&&game.points_against!=null?` • ${game.points_for}-${game.points_against}`:''}</div><div class="item-sub">${esc(game.game||'Madden 27')} • ${esc(game.team||'Detroit Lions')} • ${esc(game.mode||'Online H2H')} • ${new Date(game.played_at).toLocaleString()}${game.notes?`<br>${esc(game.notes)}`:''}</div></div><div class="item-actions"><button class="ghost" data-edit-result="${game.id}">EDIT</button><button class="danger" data-delete-result="${game.id}">DELETE</button></div></div>`).join(''):'<div class="hint">No tracked games yet. Your historical record remains counted.</div>';
+    document.querySelectorAll('[data-edit-result]').forEach(button=>button.onclick=()=>editResult(games.find(game=>game.id===button.dataset.editResult)));document.querySelectorAll('[data-delete-result]').forEach(button=>button.onclick=()=>removeResult(button.dataset.deleteResult));await refreshStatsFields();
   }
 
-  const start=()=>{installUI();const obs=new MutationObserver(()=>installUI());obs.observe(document.body,{childList:true,subtree:true});};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+  const start=()=>{installUI();const observer=new MutationObserver(()=>installUI());observer.observe(document.body,{childList:true,subtree:true})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
