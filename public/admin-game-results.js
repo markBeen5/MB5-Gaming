@@ -25,7 +25,7 @@
 
   async function scanScreenshot(event){
     const file=event.target.files&&event.target.files[0];if(!file)return;if(!window.MB5ResultScanner)return notify('Screenshot reader did not load. Refresh and try again.',true);
-    clearScan();$('grOpponent').value='';$('grPF').value='';$('grPA').value='';scanPreviewUrl=URL.createObjectURL(file);$('grScanPreview').src=scanPreviewUrl;$('grScanOutput').classList.remove('hidden');$('grScanClear').classList.remove('hidden');$('grScanStatus').textContent='Preparing screenshot…';$('grScanFile').disabled=true;
+    clearScan();if(!editingId){$('grOpponent').value='';$('grPF').value='';$('grPA').value=''}scanPreviewUrl=URL.createObjectURL(file);$('grScanPreview').src=scanPreviewUrl;$('grScanOutput').classList.remove('hidden');$('grScanClear').classList.remove('hidden');$('grScanStatus').textContent='Preparing screenshot…';$('grScanFile').disabled=true;
     try{
       const scan=await window.MB5ResultScanner.scanFile(file,progress=>{$('grScanStatus').textContent=`Reading screenshot… ${progress}%`});
       if(scan.opponent)$('grOpponent').value=scan.opponent;
