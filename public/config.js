@@ -31,7 +31,7 @@ window.MARKBEEN5_CONFIG = {
     js('admin-game-results.js?v=20260831-1');
   } else {
     css('qa.css?v=20260831-1');
-    css('mobile-final.css?v=20260901-1');
+    css('mobile-final.css?v=20260901-3');
     js('mobile-final.js?v=20260901-1');
     if (home) {
       css('community.css?v=20260901-2');
@@ -39,7 +39,7 @@ window.MARKBEEN5_CONFIG = {
     }
     if (news) {
       css('news-responsive.css?v=20260901-1');
-      css('news-mobile-fix.css?v=20260901-1');
+      css('news-mobile-fix.css?v=20260901-3');
     }
   }
   js('analytics-loader.js?v=20260831-1');

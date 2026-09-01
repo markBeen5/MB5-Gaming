@@ -6,6 +6,7 @@ const config = read('public/config.js');
 const fix = read('public/news-mobile-fix.css');
 const gta = read('public/gta6.html');
 const mobile = read('public/mobile-final.css');
+const newsPage = read('public/news.html');
 
 assert.match(config, /if \(home\)[\s\S]*community\.js/, 'Community content must load on the homepage');
 assert.doesNotMatch(config, /else \{[\s\S]*js\('community\.js[^]*if \(home\)/, 'Community content must not load before the homepage guard');
@@ -14,5 +15,8 @@ assert.match(fix, /height:\s*220px/, 'Phone news images must have a fixed safe h
 assert.match(gta, /extended-look-now-playing/, 'GTA VI hub must link to the official now-playing feature');
 assert.match(mobile, /header#home\s*\{/, 'Full-height mobile hero rules must target the homepage only');
 assert.doesNotMatch(mobile, /^\s*header\s*\{/m, 'Shared mobile styles must not stretch fixed page headers');
+assert.match(newsPage, /news-mobile-fix\.css\?v=20260901-3/, 'News must load the image-height fix directly with a fresh version');
+assert.match(newsPage, /config\.js\?v=20260901-news3/, 'News must bypass stale mobile configuration');
+assert.match(gta, /config\.js\?v=20260901-gta3/, 'GTA VI must bypass stale mobile configuration');
 
 console.log('MB5 news mobile regression checks passed.');
