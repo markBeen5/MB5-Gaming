@@ -6,6 +6,7 @@ window.MARKBEEN5_CONFIG = {
 (() => {
   const admin = /admin\.html$/i.test(location.pathname);
   const news = /news\.html$/i.test(location.pathname);
+  const home = /(?:^|\/)(?:index\.html)?$/i.test(location.pathname);
   const css = href => {
     const element = document.createElement('link');
     element.rel = 'stylesheet';
@@ -29,12 +30,17 @@ window.MARKBEEN5_CONFIG = {
     js('admin-fixes.js?v=20260831-final1');
     js('admin-game-results.js?v=20260831-1');
   } else {
-    css('community.css?v=20260831-1');
     css('qa.css?v=20260831-1');
     css('mobile-final.css?v=20260901-1');
-    js('community.js?v=20260831-1');
     js('mobile-final.js?v=20260901-1');
-    if (news) css('news-responsive.css?v=20260901-1');
+    if (home) {
+      css('community.css?v=20260901-2');
+      js('community.js?v=20260901-2');
+    }
+    if (news) {
+      css('news-responsive.css?v=20260901-1');
+      css('news-mobile-fix.css?v=20260901-1');
+    }
   }
   js('analytics-loader.js?v=20260831-1');
 })();

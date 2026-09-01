@@ -1,0 +1,23 @@
+/* Keep remotely hosted artwork from stretching over the mobile news feed. */
+.news-image {
+  display: block;
+  height: 280px;
+  object-fit: cover;
+}
+
+.news-card.featured .news-image {
+  height: min(52vw, 560px);
+}
+
+@media (max-width: 760px) {
+  .news-image,
+  .news-card.featured .news-image {
+    height: 220px;
+    aspect-ratio: auto;
+  }
+
+  .news-card {
+    position: relative;
+    isolation: isolate;
+  }
+}
