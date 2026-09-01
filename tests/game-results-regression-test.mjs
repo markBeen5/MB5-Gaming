@@ -16,7 +16,8 @@ assert.match(tracker, /A loss needs your score to be lower/, 'Tracker must valid
 assert.match(tracker, /if\(saving\)return/, 'Tracker must block repeated submissions while saving');
 assert.match(tracker, /data-edit-result/, 'Tracker must support correcting saved results');
 assert.match(tracker, /CURRENT STREAK/, 'Tracker must display the synchronized streak');
-assert.match(schema, /game_results_no_duplicate_minute/, 'Database must reject duplicate results from the same minute');
+assert.match(schema, /game_results_no_exact_duplicate/, 'Database must reject exact duplicate results');
+assert.doesNotMatch(schema, /date_trunc\('minute', played_at/, 'Back-to-back games must not be treated as duplicates');
 assert.match(schema, /alter column opponent set not null/, 'Database must require an opponent');
 assert.match(schema, /game_results_score_check/, 'Database must validate scores against the result');
 assert.match(schema, /recalculate_game_result_totals/, 'Database must synchronize record totals');
