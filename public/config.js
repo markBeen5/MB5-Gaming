@@ -28,7 +28,7 @@ window.MARKBEEN5_CONFIG = {
     js('admin-news.js?v=20260901-1');
     js('admin-gta6.js?v=20260901-1');
     js('admin-fixes.js?v=20260831-final1');
-    js('admin-game-results.js?v=20260831-1');
+    js('admin-game-results.js?v=20260901-2');
   } else {
     css('qa.css?v=20260831-1');
     css('mobile-final.css?v=20260901-3');
