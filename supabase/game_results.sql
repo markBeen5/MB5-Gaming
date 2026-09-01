@@ -25,13 +25,13 @@ create table if not exists public.game_results (
 -- Bring older installations up to the completed tracker schema.
 alter table public.game_result_baseline add column if not exists streak text not null default 'W0';
 
--- Remove accidental double submissions from the same minute before enforcing
--- the database-level duplicate guard.
+-- Remove only exact repeated submissions before enforcing the database-level
+-- duplicate guard. Legitimate back-to-back games may share the same opponent.
 with ranked_results as (
   select id,
          row_number() over (
            partition by
-             date_trunc('minute', played_at at time zone 'UTC'),
+             played_at,
              lower(trim(game)),
              lower(trim(team)),
              coalesce(lower(trim(opponent)), ''),
@@ -82,9 +82,10 @@ begin
 end
 $$;
 
-create unique index if not exists game_results_no_duplicate_minute
+drop index if exists public.game_results_no_duplicate_minute;
+create unique index if not exists game_results_no_exact_duplicate
 on public.game_results (
-  date_trunc('minute', played_at at time zone 'UTC'),
+  played_at,
   lower(trim(game)),
   lower(trim(team)),
   lower(trim(opponent)),
