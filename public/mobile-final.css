@@ -24,7 +24,7 @@ body {
     padding-inline: 4px;
   }
 
-  header {
+  header#home {
     min-height: min(680px, calc(100svh - 64px));
   }
 
@@ -200,11 +200,11 @@ body {
     letter-spacing: .03em;
   }
 
-  header small {
+  header#home small {
     letter-spacing: .16em;
   }
 
-  header h1 {
+  header#home h1 {
     font-size: clamp(44px, 16vw, 68px);
   }
 
