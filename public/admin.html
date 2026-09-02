@@ -462,19 +462,49 @@
                 </select>
               </div>
               <div class="field">
-                <label>Best vs</label
+                <label>Coverage / call type</label
                 ><select id="playCoverage">
                   <option>Man</option>
                   <option>Zone</option>
+                  <option>Match</option>
+                  <option>Blitz</option>
                 </select>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="field">
+                <label>Formation</label><input id="playFormation" placeholder="Nickel 3-3 Over" />
+              </div>
+              <div class="field">
+                <label>Call group</label
+                ><select id="playCallType">
+                  <option>Zone</option>
+                  <option>Match</option>
+                  <option>Man</option>
+                  <option>Blitz</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="field">
+                <label>Situation</label><input id="playSituation" placeholder="Early downs, long yardage..." />
+              </div>
+              <div class="field">
+                <label>Tags (comma separated)</label><input id="playTags" placeholder="zone, three-deep, pressure" />
               </div>
             </div>
             <div class="field">
               <label>Coaching tip</label><textarea id="playDetail"></textarea>
             </div>
-            <div class="field">
-              <label>Play art image URL</label><input id="playImage" />
+            <div class="grid">
+              <div class="field">
+                <label>Play art image URL</label><input id="playImage" />
+              </div>
+              <div class="field">
+                <label>Display order</label><input id="playOrder" type="number" value="10" />
+              </div>
             </div>
+            <label class="check"><input id="playEnabled" type="checkbox" checked /> SHOW ON WEBSITE</label>
             <div class="form-actions">
               <button class="btn" id="playSave" onclick="savePlay()">
                 ADD PLAY</button
@@ -838,8 +868,10 @@
           "plays",
           "playsList",
           "playsCount",
-          (x) => x.name,
-          (x) => `${x.type} • vs ${x.coverage}`,
+          (x) => `${x.sort_order ?? 0}. ${x.name}${x.enabled === false ? " (hidden)" : ""}`,
+          (x) => x.type === "Defense"
+            ? `${x.formation || "Defense"} • ${x.call_type || x.coverage || "Call"}`
+            : `${x.type} • vs ${x.coverage}`,
         );
         renderSimple(
           "schedule",
@@ -921,12 +953,21 @@
         });
       }
       function savePlay() {
+        if (!val("playName")) return toast("Play name is required", true);
+        const defensive = val("playType") === "Defense";
         writeRow("plays", {
           name: val("playName"),
           type: val("playType"),
           coverage: val("playCoverage"),
+          formation: val("playFormation") || "Unassigned",
+          call_type: defensive ? (val("playCallType") || val("playCoverage")) : "Concept",
+          situation: val("playSituation") || null,
+          tags: val("playTags").split(",").map((x) => x.trim()).filter(Boolean),
           detail: val("playDetail"),
           image_url: val("playImage") || null,
+          enabled: $("playEnabled").checked,
+          sort_order: +val("playOrder") || 0,
+          updated_at: new Date().toISOString(),
         });
       }
       function saveSchedule() {
@@ -1023,8 +1064,14 @@
           $("playName").value = x.name;
           $("playType").value = x.type;
           $("playCoverage").value = x.coverage;
+          $("playFormation").value = x.formation || "";
+          $("playCallType").value = x.call_type || x.coverage || "Zone";
+          $("playSituation").value = x.situation || "";
+          $("playTags").value = (x.tags || []).join(", ");
           $("playDetail").value = x.detail || "";
           $("playImage").value = x.image_url || "";
+          $("playOrder").value = x.sort_order ?? 0;
+          $("playEnabled").checked = x.enabled !== false;
           $("playSave").textContent = "SAVE PLAY";
           $("playCancel").classList.remove("hidden");
         } else {
@@ -1080,10 +1127,24 @@
               "gameUrl",
               "gameSlug",
             ],
-            plays: ["playName", "playDetail", "playImage"],
+            plays: [
+              "playName",
+              "playFormation",
+              "playSituation",
+              "playTags",
+              "playDetail",
+              "playImage",
+            ],
             social_links: ["socialPlatform", "socialHandle", "socialUrl"],
           }[t] || [];
         map.forEach((i) => ($(i).value = ""));
+        if (t === "plays") {
+          $("playType").value = "Offense";
+          $("playCoverage").value = "Man";
+          $("playCallType").value = "Zone";
+          $("playOrder").value = "10";
+          $("playEnabled").checked = true;
+        }
         let p = { games: "game", plays: "play", social_links: "social" }[t];
         if (p) {
           $(p + "Save").textContent =

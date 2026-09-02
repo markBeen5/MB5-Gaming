@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Detroit Lions Madden 27 Defensive Playbook | MB5 Gaming</title>
+  <meta name="description" content="MB5 Gaming Detroit Lions Madden 27 defensive playbook with Nickel 3-3 Over, Nickel 3-3 Dbl Mug, Dime 2-3, zone, match, man and blitz calls.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://markbeen5.com/defense.html">
+  <link rel="stylesheet" href="style.css?v=20260831-games1">
+  <link rel="stylesheet" href="mobile.css?v=20260831-final1">
+  <link rel="stylesheet" href="playbook.css?v=20260831-playbook1">
+  <link rel="stylesheet" href="defense.css?v=20260902-1">
+  <link rel="stylesheet" href="mobile-final.css?v=20260901-1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=20260902-defense1"></script>
+</head>
+<body class="playbook-page defense-page">
+  <nav class="site-nav" aria-label="Primary navigation">
+    <a class="nav-brand" href="index.html#home">MB<span>5</span></a>
+    <div class="nav-links playbook-nav-links">
+      <a href="index.html">HOME</a>
+      <a href="index.html#madden">MADDEN 27</a>
+      <a href="playbook.html">OFFENSE</a>
+      <a class="active" href="defense.html">DEFENSE</a>
+      <a class="admin-link" href="admin.html">ADMIN</a>
+    </div>
+  </nav>
+
+  <header class="defense-hero">
+    <div class="defense-hero-shade"></div>
+    <div class="playbook-hero-copy">
+      <div class="section-kicker">MB5 DEFENSIVE PLAYBOOK</div>
+      <h1>PROTECT THE DEN.<br><span>CONTROL THE FIELD.</span></h1>
+      <p>Marcus's Detroit Lions Madden 27 defensive calls, organized by formation and coverage type.</p>
+      <div class="hero-badges"><span>3 FORMATIONS</span><span>10 STARTER CALLS</span><span>SEARCH + FILTER</span></div>
+    </div>
+  </header>
+
+  <main class="playbook-main defense-main">
+    <section class="defense-formations" aria-labelledby="formationHeading">
+      <div class="defense-section-head"><div><div class="section-kicker">FORMATION PACKAGES</div><h2 id="formationHeading">THE MB5 DEFENSIVE CORE</h2></div><p>Built directly from the game-screen references supplied for the site.</p></div>
+      <div class="formation-grid">
+        <article class="formation-card"><img src="defense-33-over.jpg" alt="Madden 27 Nickel 3-3 Over defensive play selection" loading="eager"><div><span>PACKAGE 01</span><h3>NICKEL 3-3 OVER</h3><p>Match, pressure and bracket-man calls.</p><button data-jump-filter="nickel-3-3-over">VIEW CALLS</button></div></article>
+        <article class="formation-card"><img src="defense-33-dbl-mug.jpg" alt="Madden 27 Nickel 3-3 Dbl Mug defensive play selection" loading="lazy"><div><span>PACKAGE 02</span><h3>NICKEL 3-3 DBL MUG</h3><p>Three-deep zone and interior pressure calls.</p><button data-jump-filter="nickel-3-3-dbl-mug">VIEW CALLS</button></div></article>
+        <article class="formation-card"><img src="defense-dime-23.jpg" alt="Madden 27 Dime 2-3 defensive play selection" loading="lazy"><div><span>PACKAGE 03</span><h3>DIME 2-3</h3><p>Match, man and stunt pressure calls.</p><button data-jump-filter="dime-2-3">VIEW CALLS</button></div></article>
+      </div>
+    </section>
+
+    <section id="defenseLibrary" class="playbook-tools defense-tools" aria-label="Defensive play filters">
+      <label class="playbook-search"><span>SEARCH DEFENSIVE CALLS</span><input id="defenseSearch" type="search" placeholder="Cover 3, Mid Blitz, Dime 2-3..." autocomplete="off"></label>
+      <div id="defenseFilters" class="playbook-filters defense-filters">
+        <button class="active" data-filter="all">ALL</button>
+        <button data-filter="zone">ZONE</button>
+        <button data-filter="match">MATCH</button>
+        <button data-filter="man">MAN</button>
+        <button data-filter="blitz">BLITZ</button>
+        <button data-filter="nickel-3-3-over">3-3 OVER</button>
+        <button data-filter="nickel-3-3-dbl-mug">3-3 DBL MUG</button>
+        <button data-filter="dime-2-3">DIME 2-3</button>
+      </div>
+      <div class="playbook-count"><strong id="defenseCount">10</strong> calls showing</div>
+    </section>
+
+    <section aria-labelledby="callsHeading">
+      <div class="defense-section-head compact"><div><div class="section-kicker">CALL SHEET</div><h2 id="callsHeading">DEFENSIVE LIBRARY</h2></div></div>
+      <div id="defenseGrid" class="defense-grid" aria-live="polite"><article class="playbook-empty">Loading defensive calls…</article></div>
+      <div id="defenseEmpty" class="playbook-empty" hidden>No defensive calls match that search.</div>
+    </section>
+
+    <section class="playbook-legend defense-next">
+      <div><strong>NEXT DEFENSIVE PASS</strong><p>The formation and call library is live first. Add your exact pre-snap adjustments, user responsibility and situation notes from the MB5 Admin Playbook tab as you test each call.</p></div>
+      <a class="btn" href="admin.html">OPEN PLAYBOOK ADMIN</a>
+    </section>
+  </main>
+
+  <footer>MB5 DEFENSE • DETROIT LIONS • MADDEN 27</footer>
+  <script src="defense-data.js?v=20260902-1"></script>
+  <script src="defense.js?v=20260902-1"></script>
+</body>
+</html>
+
