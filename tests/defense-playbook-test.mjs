@@ -20,6 +20,9 @@ assert.match(data, /Cover 3 Buzz Match/, 'Starter calls must include Cover 3 Buz
 assert.match(data, /Over Storm Brave/, 'Starter calls must include Over Storm Brave');
 assert.match(data, /Mid Blitz/, 'Starter calls must include Mid Blitz');
 assert.match(data, /Field Stunt 3/, 'Starter calls must include Field Stunt 3');
+assert.match(data, /Texas 2 Man stunt/, 'Double Bracket must include the supplied stunt adjustment');
+assert.match(data, /shade outside against quick outs/, 'Dime calls must include the conditional outside shade');
+assert.match(data, /formation: 'Big Nickel'/, 'Cover 3 Drop must use the confirmed Big Nickel formation');
 assert.match(script, /\.eq\('type', 'Defense'\)/, 'Public defense page must request only defensive plays');
 assert.match(script, /\.eq\('enabled', true\)/, 'Public defense page must request only enabled plays');
 assert.match(css, /grid-template-columns:1fr/, 'Defense page must collapse to one column on phones');
