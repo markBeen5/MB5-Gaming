@@ -407,3 +407,40 @@
     min-height:240px
   }
 }
+}/* MOBILE OFFLINE SCREEN FIX */
+@media(max-width:700px){
+  .offline-overlay{
+    padding:8px 12px;
+  }
+
+  .offline-overlay>div{
+    max-width:300px;
+  }
+
+  .offline-icon{
+    width:38px;
+    height:38px;
+    font-size:13px;
+    border-radius:10px;
+  }
+
+  .offline-overlay h3{
+    font-size:28px;
+    line-height:1;
+    margin:5px 0 4px;
+  }
+
+  .offline-overlay p{
+    font-size:11px;
+    line-height:1.15;
+    margin:0 auto 7px;
+    max-width:240px;
+  }
+
+  .offline-overlay .btn{
+    min-height:36px;
+    padding:6px 10px;
+    font-size:11px;
+  }
+}
+
