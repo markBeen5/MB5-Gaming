@@ -449,5 +449,19 @@
   background:#05080c !important;
 }
 
+/* FORCE CUSTOM OFFLINE OVERLAY ABOVE TWITCH PLAYER */
+.offline-overlay{
+  z-index:10 !important;
+  background:#05080c !important;
+}
+
+.player-shell iframe{
+  z-index:1;
+}
+
+
+
+
+
 
 
