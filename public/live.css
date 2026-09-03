@@ -444,3 +444,10 @@
   }
 }
 
+/* HIDE TWITCH OFFLINE SCREEN BEHIND CUSTOM OVERLAY */
+.offline-overlay{
+  background:#05080c !important;
+}
+
+
+
