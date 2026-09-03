@@ -459,6 +459,13 @@
   z-index:1;
 }
 
+/* KEEP MOBILE CHAT ABOVE BOTTOM NAV */
+@media(max-width:700px){
+  .live-section{
+    padding-bottom:160px !important;
+  }
+}
+
 
 
 
