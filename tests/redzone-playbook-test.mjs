@@ -5,20 +5,20 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 const html = read('public/playbook.html');
 const css = read('public/redzone.css');
 
-assert.match(html, /RED ZONE \+ GOAL LINE CALL SHEET/, 'Offensive page must include the situational call sheet');
-assert.match(html, /Z SPOT GOALLINE/, 'Red-zone package must include Z Spot Goalline');
-assert.match(html, /Z MESH GOALLINE/, 'Red-zone package must include Z Mesh Goalline');
-assert.match(html, /Y FLAT GOALLINE/, 'Red-zone package must include Y Flat Goalline');
-assert.match(html, /BENCH HB ANGLE/, 'Red-zone package must include Bench HB Angle');
-assert.match(html, /RPO ALERT BUBBLE/, 'Red-zone package must include RPO Alert Bubble');
-assert.match(html, /HB POWER G/, 'Goal-line package must include HB Power G');
-assert.match(html, /HB DIVE/, 'Goal-line package must include HB Dive');
-assert.match(html, /QB SNEAK/, 'Goal-line package must include QB Sneak');
-assert.match(html, /PA SPOT/, 'Goal-line package must include PA Spot');
-assert.match(html, /PA WAGGLE/, 'Goal-line package must include PA Waggle');
-assert.match(html, /STRONG TOSS/, 'Goal-line package must include Strong Toss');
-assert.match(html, /Run until the defense adds a box defender/, 'Call sheet must include the MB5 decision rule');
-assert.match(css, /@media \(max-width: 650px\)/, 'Call sheet must include phone-specific styles');
-assert.match(css, /\.redzone-groups \{ grid-template-columns: 1fr; \}/, 'Call groups must stack on phones');
+assert.match(html, /RED ZONE \+ GOAL LINE/, 'Offensive page must include the red-zone and goal-line section');
+assert.match(html, /20–11 YDS/, 'Red-zone ladder must include the 20–11 yard range');
+assert.match(html, /Z Spot \/ Bench HB Angle/, 'Red-zone ladder must include Z Spot and Bench HB Angle');
+assert.match(html, /10–6 YDS/, 'Red-zone ladder must include the 10–6 yard range');
+assert.match(html, /Z Mesh \/ RPO Alert Bubble/, 'Red-zone ladder must include Z Mesh and RPO Alert Bubble');
+assert.match(html, /5–2 YDS/, 'Goal-line ladder must include the 5–2 yard range');
+assert.match(html, /HB Power G \/ PA Spot/, 'Goal-line ladder must include HB Power G and PA Spot');
+assert.match(html, /1 YD OR INCHES/, 'Goal-line ladder must include the 1-yard-or-inches range');
+assert.match(html, /QB Sneak \/ HB Dive/, 'Goal-line ladder must include QB Sneak and HB Dive');
+assert.match(html, /data-situation="red"/, 'Situation caller must include a red-zone option');
+assert.match(html, /data-situation="goal"/, 'Situation caller must include a goal-line option');
+assert.match(html, /red:\['Z SPOT \/ BENCH HB ANGLE'/, 'Red-zone situation call must include the current first call');
+assert.match(html, /goal:\['HB POWER G'/, 'Goal-line situation call must include the current first call');
+assert.match(css, /@media \(max-width: 650px\)/, 'Red-zone section must include phone-specific styles');
+assert.match(css, /\.redzone-groups \{ grid-template-columns: 1fr; \}/, 'Red-zone call groups must stack on phones');
 
 console.log('MB5 red-zone and goal-line checks passed.');
