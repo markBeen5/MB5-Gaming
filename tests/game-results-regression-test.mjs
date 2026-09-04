@@ -26,7 +26,7 @@ assert.doesNotMatch(schema, /date_trunc\('minute', played_at/, 'Back-to-back gam
 assert.match(schema, /alter column opponent set not null/, 'Database must require an opponent');
 assert.match(schema, /game_results_score_check/, 'Database must validate scores against the result');
 assert.match(schema, /recalculate_game_result_totals/, 'Database must synchronize record totals');
-assert.match(schema, /streak = current_streak/, 'Database must synchronize the streak');
+assert.match(schema, /streak\s*=\s*current_streak/, 'Database must synchronize the streak');
 assert.match(schema, /to authenticated/, 'Tracker policies must target authenticated users');
 assert.match(schema, /revoke all on function public\.refresh_stats_from_game_results/, 'Internal trigger must not be directly callable');
 
