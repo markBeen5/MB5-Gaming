@@ -49,6 +49,7 @@ window.MARKBEEN5_CONFIG = {
     js('game-result-scan.js?v=20260901-1');
     js('admin-game-results.js?v=20260901-3');
     js('admin-madden-season-tools.js?v=20260904-1');
+    js('admin-madden-season-manager.js?v=20260904-1');
   } else {
     css('qa.css?v=20260831-1');
     css('mobile-final.css?v=20260901-3');
@@ -62,6 +63,7 @@ window.MARKBEEN5_CONFIG = {
       css('news-mobile-fix.css?v=20260901-3');
     }
     if (maddenResults) {
+      css('madden-dashboard.css?v=20260904-1');
       css('madden-opponent-intel.css?v=20260904-1');
       css('madden-results-tools.css?v=20260904-2');
       css('madden-mode-insights.css?v=20260904-1');
@@ -71,6 +73,7 @@ window.MARKBEEN5_CONFIG = {
       css('madden-season-timeline.css?v=20260904-1');
       css('madden-playoff-rivalry.css?v=20260904-1');
       css('madden-championship-archive.css?v=20260904-1');
+      js('madden-dashboard.js?v=20260904-1');
       js('madden-opponent-intel.js?v=20260904-1');
       js('madden-results-tools.js?v=20260904-2');
       js('madden-mode-insights.js?v=20260904-1');
