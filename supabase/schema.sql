@@ -14,6 +14,7 @@ do $$ declare t text; begin foreach t in array ARRAY['site_settings','live_statu
 insert into public.site_settings(tagline) select 'Competitive gamer & content creator. Madden 27. Detroit Lions. Gameplay, strategy, clips and live streams.' where not exists(select 1 from public.site_settings);
 insert into public.live_status(enabled,title,description,url) select true,'MADDEN 27 — DETROIT LIONS','Online head-to-head • Road to #1','https://www.twitch.tv/markbeen5' where not exists(select 1 from public.live_status);
 insert into public.stats(wins,losses,streak) select 127,42,'W7' where not exists(select 1 from public.stats);
-insert into public.social_links(platform,handle,url) select * from (values('Twitch','@markbeen5','https://www.twitch.tv/markbeen5'),('Kick','@markbeen5','https://kick.com/markbeen5'),('TikTok','@markbeen5','https://www.tiktok.com/@markbeen5'),('Instagram','@markbeenv','https://www.instagram.com/markbeenv/'),('YouTube','@markBeen5','https://www.youtube.com/@markBeen5'))v(p,h,u) where not exists(select 1 from public.social_links);
+insert into public.social_links(platform,handle,url) select * from (values('Twitch','@markbeen5','https://www.twitch.tv/markbeen5'),('Kick','@markbeen5','https://kick.com/markbeen5'),('TikTok','@markbeen5','https://www.tiktok.com/@markbeen5'),('Instagram','@markbeen5','https://www.instagram.com/markbeen5/'),('YouTube','@markBeen5','https://www.youtube.com/@markBeen5'))v(p,h,u) where not exists(select 1 from public.social_links);
+update public.social_links set handle='@markbeen5',url='https://www.instagram.com/markbeen5/' where lower(platform)='instagram';
 -- After creating your Auth account, add its UUID:
 -- insert into public.admin_users(user_id) values('YOUR-AUTH-USER-UUID');
