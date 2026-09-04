@@ -45,7 +45,9 @@ window.MARKBEEN5_CONFIG = {
     }
     if (maddenResults) {
       css('madden-opponent-intel.css?v=20260904-1');
+      css('madden-results-tools.css?v=20260904-1');
       js('madden-opponent-intel.js?v=20260904-1');
+      js('madden-results-tools.js?v=20260904-1');
     }
   }
   js('analytics-loader.js?v=20260831-1');
