@@ -21,6 +21,23 @@ window.MARKBEEN5_CONFIG = {
     document.head.appendChild(element);
   };
 
+  if (maddenResults && window.supabase?.createClient && !window.MB5_MADDEN_RESULTS_CACHE_READY) {
+    const originalCreateClient = window.supabase.createClient.bind(window.supabase);
+    let resultsPromise = null;
+    window.supabase.createClient = (...args) => {
+      const client = originalCreateClient(...args);
+      const originalRpc = client.rpc.bind(client);
+      client.rpc = (name, params, options) => {
+        const sameFeed = name === 'get_madden27_lions_results' && Number(params?.limit_count ?? 100) === 100;
+        if (!sameFeed) return originalRpc(name, params, options);
+        if (!resultsPromise) resultsPromise = Promise.resolve(originalRpc(name, params, options));
+        return resultsPromise;
+      };
+      return client;
+    };
+    window.MB5_MADDEN_RESULTS_CACHE_READY = true;
+  }
+
   if (admin) {
     css('admin-enhance.css?v=20260831-1');
     css('admin-mobile.css?v=20260901-2');
@@ -45,16 +62,18 @@ window.MARKBEEN5_CONFIG = {
     }
     if (maddenResults) {
       css('madden-opponent-intel.css?v=20260904-1');
-      css('madden-results-tools.css?v=20260904-1');
+      css('madden-results-tools.css?v=20260904-2');
       css('madden-mode-insights.css?v=20260904-1');
       css('madden-season-records.css?v=20260904-1');
       css('madden-results-mobile-polish.css?v=20260904-1');
       css('madden-season-story.css?v=20260904-1');
+      css('madden-season-timeline.css?v=20260904-1');
       js('madden-opponent-intel.js?v=20260904-1');
-      js('madden-results-tools.js?v=20260904-1');
+      js('madden-results-tools.js?v=20260904-2');
       js('madden-mode-insights.js?v=20260904-1');
       js('madden-season-records.js?v=20260904-1');
       js('madden-season-story.js?v=20260904-1');
+      js('madden-season-timeline.js?v=20260904-1');
     }
   }
   js('analytics-loader.js?v=20260831-1');
