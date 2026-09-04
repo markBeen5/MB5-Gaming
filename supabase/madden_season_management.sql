@@ -52,6 +52,41 @@ $$;
 revoke all on function public.get_madden_seasons() from public;
 grant execute on function public.get_madden_seasons() to anon,authenticated;
 
+create or replace function public.start_new_madden_season(season_name text)
+returns table(id uuid,name text,status text,started_at timestamptz)
+language plpgsql
+security definer
+set search_path=pg_catalog,public
+as $$
+declare
+  clean_name text := btrim(coalesce(season_name,''));
+  new_id uuid;
+begin
+  if not public.is_admin() then
+    raise exception 'Admin access required';
+  end if;
+  if clean_name = '' then
+    raise exception 'Season name is required';
+  end if;
+  perform pg_advisory_xact_lock(hashtext('mb5:madden27:detroit_lions:season_start'));
+  if exists(select 1 from public.madden_seasons s where lower(s.name)=lower(clean_name)) then
+    raise exception 'A Madden season named % already exists', clean_name;
+  end if;
+  update public.madden_seasons
+  set status='archived', ended_at=now()
+  where status='active' and game='Madden 27' and team='Detroit Lions';
+  insert into public.madden_seasons(name,game,team,status)
+  values(clean_name,'Madden 27','Detroit Lions','active')
+  returning madden_seasons.id into new_id;
+  return query
+  select s.id,s.name,s.status,s.started_at
+  from public.madden_seasons s
+  where s.id=new_id;
+end;
+$$;
+revoke all on function public.start_new_madden_season(text) from public,anon;
+grant execute on function public.start_new_madden_season(text) to authenticated;
+
 -- Replace the one-argument feed with a season-aware version. If no season is supplied, use the active campaign.
 drop function if exists public.get_madden27_lions_results(integer);
 create or replace function public.get_madden27_lions_results(limit_count integer default 100, season_filter uuid default null)
