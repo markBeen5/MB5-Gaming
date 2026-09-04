@@ -161,8 +161,17 @@
 }
 
 @media (max-width: 760px) {
+  .visitor-wall-section {
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  }
+
+  .visitor-wall-head {
+    margin-bottom: 18px;
+  }
+
   .visitor-wall-layout {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
   .visitor-form-shell {
@@ -173,6 +182,10 @@
   .visitor-form-shell textarea {
     min-height: 44px;
     font-size: 16px;
+  }
+
+  .visitor-form-shell .btn {
+    min-height: 50px;
   }
 
   .visitor-card-top {
