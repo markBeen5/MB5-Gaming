@@ -49,10 +49,12 @@ window.MARKBEEN5_CONFIG = {
       css('madden-mode-insights.css?v=20260904-1');
       css('madden-season-records.css?v=20260904-1');
       css('madden-results-mobile-polish.css?v=20260904-1');
+      css('madden-season-story.css?v=20260904-1');
       js('madden-opponent-intel.js?v=20260904-1');
       js('madden-results-tools.js?v=20260904-1');
       js('madden-mode-insights.js?v=20260904-1');
       js('madden-season-records.js?v=20260904-1');
+      js('madden-season-story.js?v=20260904-1');
     }
   }
   js('analytics-loader.js?v=20260831-1');
