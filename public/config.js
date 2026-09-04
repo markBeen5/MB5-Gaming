@@ -7,6 +7,7 @@ window.MARKBEEN5_CONFIG = {
   const admin = /admin\.html$/i.test(location.pathname);
   const news = /news\.html$/i.test(location.pathname);
   const home = /(?:^|\/)(?:index\.html)?$/i.test(location.pathname);
+  const maddenResults = /madden-results\.html$/i.test(location.pathname);
   const css = href => {
     const element = document.createElement('link');
     element.rel = 'stylesheet';
@@ -41,6 +42,10 @@ window.MARKBEEN5_CONFIG = {
     if (news) {
       css('news-responsive.css?v=20260901-1');
       css('news-mobile-fix.css?v=20260901-3');
+    }
+    if (maddenResults) {
+      css('madden-opponent-intel.css?v=20260904-1');
+      js('madden-opponent-intel.js?v=20260904-1');
     }
   }
   js('analytics-loader.js?v=20260831-1');
