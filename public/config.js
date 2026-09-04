@@ -23,6 +23,7 @@ window.MARKBEEN5_CONFIG = {
 
   if (maddenResults && window.supabase?.createClient && !window.MB5_MADDEN_RESULTS_CACHE_READY) {
     const originalCreateClient = window.supabase.createClient.bind(window.supabase);
+    const selectedSeason = new URLSearchParams(location.search).get('season');
     let resultsPromise = null;
     window.supabase.createClient = (...args) => {
       const client = originalCreateClient(...args);
@@ -30,7 +31,9 @@ window.MARKBEEN5_CONFIG = {
       client.rpc = (name, params, options) => {
         const sameFeed = name === 'get_madden27_lions_results' && Number(params?.limit_count ?? 100) === 100;
         if (!sameFeed) return originalRpc(name, params, options);
-        if (!resultsPromise) resultsPromise = Promise.resolve(originalRpc(name, params, options));
+        const feedParams = {...(params || {})};
+        if (selectedSeason) feedParams.season_filter = selectedSeason;
+        if (!resultsPromise) resultsPromise = Promise.resolve(originalRpc(name, feedParams, options));
         return resultsPromise;
       };
       return client;
@@ -48,7 +51,7 @@ window.MARKBEEN5_CONFIG = {
     js('admin-fixes.js?v=20260831-final1');
     js('game-result-scan.js?v=20260901-1');
     js('admin-game-results.js?v=20260901-3');
-    js('admin-madden-season-tools.js?v=20260904-1');
+    js('admin-madden-season-tools.js?v=20260904-2');
     js('admin-madden-season-manager.js?v=20260904-1');
   } else {
     css('qa.css?v=20260831-1');
@@ -63,7 +66,7 @@ window.MARKBEEN5_CONFIG = {
       css('news-mobile-fix.css?v=20260901-3');
     }
     if (maddenResults) {
-      css('madden-dashboard.css?v=20260904-1');
+      css('madden-dashboard.css?v=20260904-2');
       css('madden-opponent-intel.css?v=20260904-1');
       css('madden-results-tools.css?v=20260904-2');
       css('madden-mode-insights.css?v=20260904-1');
@@ -73,7 +76,8 @@ window.MARKBEEN5_CONFIG = {
       css('madden-season-timeline.css?v=20260904-1');
       css('madden-playoff-rivalry.css?v=20260904-1');
       css('madden-championship-archive.css?v=20260904-1');
-      js('madden-dashboard.js?v=20260904-1');
+      css('madden-season-awards.css?v=20260904-1');
+      js('madden-dashboard.js?v=20260904-2');
       js('madden-opponent-intel.js?v=20260904-1');
       js('madden-results-tools.js?v=20260904-2');
       js('madden-mode-insights.js?v=20260904-1');
@@ -82,6 +86,7 @@ window.MARKBEEN5_CONFIG = {
       js('madden-season-timeline.js?v=20260904-1');
       js('madden-playoff-rivalry.js?v=20260904-1');
       js('madden-championship-archive.js?v=20260904-1');
+      js('madden-season-awards.js?v=20260904-1');
     }
   }
   js('analytics-loader.js?v=20260831-1');
