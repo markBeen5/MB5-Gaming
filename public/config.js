@@ -24,7 +24,7 @@ window.MARKBEEN5_CONFIG = {
   if (maddenResults && window.supabase?.createClient && !window.MB5_MADDEN_RESULTS_CACHE_READY) {
     const originalCreateClient = window.supabase.createClient.bind(window.supabase);
     const selectedSeason = new URLSearchParams(location.search).get('season');
-    let resultsPromise = null;
+    const resultsPromises = new Map();
     window.supabase.createClient = (...args) => {
       const client = originalCreateClient(...args);
       const originalRpc = client.rpc.bind(client);
@@ -32,9 +32,10 @@ window.MARKBEEN5_CONFIG = {
         const sameFeed = name === 'get_madden27_lions_results' && Number(params?.limit_count ?? 100) === 100;
         if (!sameFeed) return originalRpc(name, params, options);
         const feedParams = {...(params || {})};
-        if (selectedSeason) feedParams.season_filter = selectedSeason;
-        if (!resultsPromise) resultsPromise = Promise.resolve(originalRpc(name, feedParams, options));
-        return resultsPromise;
+        if (!feedParams.season_filter && selectedSeason) feedParams.season_filter = selectedSeason;
+        const key = feedParams.season_filter || '__active__';
+        if (!resultsPromises.has(key)) resultsPromises.set(key, Promise.resolve(originalRpc(name, feedParams, options)));
+        return resultsPromises.get(key);
       };
       return client;
     };
@@ -77,6 +78,7 @@ window.MARKBEEN5_CONFIG = {
       css('madden-playoff-rivalry.css?v=20260904-1');
       css('madden-championship-archive.css?v=20260904-1');
       css('madden-season-awards.css?v=20260904-1');
+      css('madden-results-navigation.css?v=20260904-1');
       js('madden-dashboard.js?v=20260904-2');
       js('madden-opponent-intel.js?v=20260904-1');
       js('madden-results-tools.js?v=20260904-2');
@@ -87,6 +89,7 @@ window.MARKBEEN5_CONFIG = {
       js('madden-playoff-rivalry.js?v=20260904-1');
       js('madden-championship-archive.js?v=20260904-1');
       js('madden-season-awards.js?v=20260904-1');
+      js('madden-results-navigation.js?v=20260904-1');
     }
   }
   js('analytics-loader.js?v=20260831-1');
