@@ -20,9 +20,11 @@
       box.innerHTML=links.filter(([id])=>document.getElementById(id)).map(([id,label])=>`<a href="#${id}">${label}</a>`).join('');
       links.forEach(([id])=>document.getElementById(id)?.classList.add('mb5-ordered-section'));
     };
+    const getRecentTitle=()=>[...document.querySelectorAll('.title')].find(x=>/MADDEN 27 RECENT GAMES/i.test(x.textContent||''));
     const reorder=()=>{
-      const recentTitle=[...document.querySelectorAll('.title')].find(x=>/MADDEN 27 RECENT GAMES/i.test(x.textContent||''));
+      const recentTitle=getRecentTitle();
       if(!recentTitle)return;
+      if(!document.getElementById('games'))recentTitle.id='games';
       const parent=recentTitle.parentNode;
       const order=['mb5Dashboard','seasonAwards','championshipHQ','rivalryCenter','seasonRecords','seasonTimeline','championshipArchive','seasonCompare','shareCenter'];
       let anchor=recentTitle;
@@ -38,7 +40,7 @@
     const seasonRes=await db.rpc('get_madden_seasons');
     const seasons=seasonRes.data||[];
     if(seasons.length){
-      const recentTitle=[...document.querySelectorAll('.title')].find(x=>/MADDEN 27 RECENT GAMES/i.test(x.textContent||''));
+      const recentTitle=getRecentTitle();
       if(recentTitle&&!document.getElementById('seasonCompare')){
         const section=document.createElement('section');
         section.id='seasonCompare';
