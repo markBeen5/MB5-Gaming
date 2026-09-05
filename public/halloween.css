@@ -1,4 +1,4 @@
-/* HALLOWEEN: THE GAME COUNTDOWN */
+/* HALLOWEEN: THE GAME */
 .halloween-hq{position:relative;overflow:hidden;border:1px solid #5b2a12;border-radius:24px;padding:clamp(22px,4vw,56px);min-height:620px;background:radial-gradient(circle at 78% 45%,#ff5a0026,transparent 24%),linear-gradient(135deg,#030405 0%,#08090c 55%,#120904 100%);box-shadow:0 24px 70px #000a,inset 0 0 0 1px #ff6a0018}
 .halloween-hq::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 38px,#ff5a0005 39px 40px);pointer-events:none}
 .halloween-inner{position:relative;z-index:2;max-width:760px}
@@ -7,11 +7,14 @@
 .halloween-title{margin:0;color:#f5eee3;font-size:clamp(44px,8vw,92px);line-height:.84;font-style:italic;text-transform:uppercase;text-shadow:0 3px 22px #000}
 .halloween-title span{display:block;color:#ff6a00;font-size:.48em;letter-spacing:.22em;margin-top:12px}
 .halloween-copy{max-width:650px;color:#d8d0c6;font-size:clamp(14px,1.8vw,18px);line-height:1.55;margin:20px 0}
-.halloween-countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:26px 0 14px;max-width:700px}
+.halloween-countdown{display:none!important}
 .halloween-time{background:#07090ce8;border:1px solid #8b370f;border-radius:14px;padding:16px 8px;text-align:center;box-shadow:inset 0 0 22px #ff5a0009}
 .halloween-time strong{display:block;color:#ff6a00;font-size:clamp(30px,5vw,58px);line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 0 16px #ff5a0044}
 .halloween-time small{display:block;margin-top:8px;color:#d6c6b8;font-size:9px;font-weight:900;letter-spacing:.16em}
-.halloween-release{color:#ff9a52;font-weight:900;letter-spacing:.12em;font-size:12px;margin-bottom:20px}
+.halloween-release,.halloween-available{color:#ff9a52;font-weight:900;letter-spacing:.12em;font-size:12px;margin:22px 0 20px}
+.halloween-available{display:flex;flex-direction:column;gap:6px;padding:18px 20px;border:1px solid #8b370f;border-radius:16px;background:linear-gradient(135deg,#2b0e00,#0b0b0d);box-shadow:0 0 30px #ff5a0022}
+.halloween-available strong{font-size:clamp(28px,5vw,52px);line-height:1;color:#ff6a00;letter-spacing:.04em;font-style:italic}
+.halloween-available span{font-size:11px;color:#f6dfcc;letter-spacing:.12em}
 .halloween-meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
 .halloween-meta span{border:1px solid #6f3519;background:#07090ce8;border-radius:999px;padding:8px 11px;font-size:10px;font-weight:900;letter-spacing:.08em;color:#fff}
 .halloween-news{margin-top:22px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:760px}
@@ -21,5 +24,12 @@
 .halloween-news a{color:#ff7a1a;font-weight:900;font-size:11px;text-decoration:none}
 .halloween-hq .btn{background:#ff5a00;border-color:#ff7a1a;color:#fff;box-shadow:0 0 24px #ff5a0033}
 .halloween-hq .btn:hover{background:#ff741f}
+.halloween-media{margin-top:26px;padding-top:22px;border-top:1px solid #5b2a12}
+.halloween-media-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}
+.halloween-media-head h3{margin:0;color:#fff;font-size:clamp(22px,4vw,34px);font-style:italic}
+.halloween-media-head a{color:#ff7a1a;font-weight:900;font-size:11px;text-decoration:none}
+.halloween-media-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.halloween-media-card{display:block;padding:14px;border:1px solid #3b2417;border-radius:14px;background:#06080bee;color:#fff;text-decoration:none}
+.halloween-media-card strong{display:block;margin-bottom:5px}.halloween-media-card span{color:#bdb4ab;font-size:12px}
 @media(max-width:900px){.halloween-pumpkin{opacity:.26;width:80vw;right:-28vw}}
-@media(max-width:700px){.halloween-hq{min-height:0;padding:20px 14px 24px}.halloween-pumpkin{width:105vw;right:-43vw;opacity:.22}.halloween-inner{max-width:none}.halloween-title{font-size:clamp(34px,11.5vw,50px);white-space:nowrap;letter-spacing:-.035em}.halloween-title span{white-space:normal;letter-spacing:.18em}.halloween-copy{font-size:13px}.halloween-countdown{gap:6px;margin-top:20px}.halloween-time{padding:12px 4px}.halloween-time strong{font-size:clamp(27px,10vw,38px)}.halloween-time small{font-size:7px;letter-spacing:.08em}.halloween-news{grid-template-columns:1fr}}
+@media(max-width:700px){.halloween-hq{min-height:0;padding:20px 14px 24px}.halloween-pumpkin{width:105vw;right:-43vw;opacity:.22}.halloween-inner{max-width:none}.halloween-title{font-size:clamp(34px,11.5vw,50px);white-space:nowrap;letter-spacing:-.035em}.halloween-title span{white-space:normal;letter-spacing:.18em}.halloween-copy{font-size:13px}.halloween-news,.halloween-media-grid{grid-template-columns:1fr}.halloween-media-head{align-items:flex-start;flex-direction:column}}
