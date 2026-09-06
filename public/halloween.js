@@ -73,7 +73,16 @@
     .halloween-clip-body{padding:12px}.halloween-clip-body small{color:#ff7a1a;font-weight:900;letter-spacing:.08em}.halloween-clip-body b{display:block;margin-top:5px;font-size:13px;line-height:1.3}.halloween-clip-body p{margin:6px 0 0;color:#bdb4ab;font-size:11px;line-height:1.35}
     .halloween-watch{display:inline-block;margin-top:9px;color:#ff7a1a;text-decoration:none;font-size:10px;font-weight:900;letter-spacing:.04em}
     .halloween-empty{grid-column:1/-1;padding:14px;border:1px dashed #5b2a12;border-radius:14px;color:#bdb4ab;background:#06080b99;font-size:12px}
-    @media(max-width:700px){.halloween-media-head,.halloween-stream-card{align-items:flex-start;flex-direction:column}.halloween-clip-grid{grid-template-columns:1fr}.halloween-available strong{font-size:clamp(28px,10vw,42px)}}`;
+
+    /* Main Clips & Highlights cards: replace the old empty MB5 placeholder with a real Twitch play preview. */
+    #highlightGrid .highlight-thumb.no-thumb{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:250px!important;background:radial-gradient(circle at 50% 40%,#5b2200 0,#241108 42%,#08090c 82%)!important;overflow:hidden!important}
+    #highlightGrid .highlight-thumb.no-thumb::before,#highlightGrid .highlight-thumb.no-thumb::after{content:none!important;display:none!important}
+    #highlightGrid .mb5-twitch-preview{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;background:linear-gradient(135deg,#ff5a001c,transparent 48%),repeating-linear-gradient(135deg,#ffffff05 0 1px,transparent 1px 12px);pointer-events:none}
+    #highlightGrid .mb5-twitch-preview .play{display:grid;place-items:center;width:76px;height:76px;border:2px solid #ff7a1a;border-radius:50%;background:#090909e8;box-shadow:0 0 36px #ff5a0066;color:#fff;font-size:30px;padding-left:5px}
+    #highlightGrid .mb5-twitch-preview strong{color:#fff;font-size:15px;letter-spacing:.13em}
+    #highlightGrid .mb5-twitch-preview span{color:#ff9c58;font-size:11px;font-weight:900;letter-spacing:.14em}
+    @media(max-width:700px){.halloween-media-head,.halloween-stream-card{align-items:flex-start;flex-direction:column}.halloween-clip-grid{grid-template-columns:1fr}.halloween-available strong{font-size:clamp(28px,10vw,42px)}#highlightGrid .highlight-thumb.no-thumb{min-height:210px!important}}
+  `;
   document.head.appendChild(style);
 
   const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[ch]));
@@ -90,6 +99,22 @@
       return hay.includes('halloween');
     }).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).slice(0,4);
     grid.innerHTML=clips.length?clips.map(x=>`<article class="halloween-clip-card">${clipMedia(x)}<div class="halloween-clip-body"><small>${esc((x.game||'HALLOWEEN: THE GAME').toUpperCase())} • ${esc((x.platform||'CLIP').toUpperCase())}</small><b>${esc(x.title||'Halloween: The Game highlight')}</b><p>${esc(x.description||'Watch this MB5 Halloween highlight.')}</p><a class="halloween-watch" href="${esc(x.url||'https://www.twitch.tv/markbeen5/clips')}" target="_blank" rel="noopener">WATCH HIGHLIGHT ↗</a></div></article>`).join(''):`<article class="halloween-empty">No Halloween clips are posted in the MB5 highlight feed yet. <a href="https://www.twitch.tv/markbeen5/clips" target="_blank" rel="noopener" style="color:#ff7a1a">Open MarkBeen5's Twitch clips ↗</a></article>`;
+  }
+
+  function fixMainHighlightPreviews(){
+    document.querySelectorAll('#highlightGrid .highlight-thumb.no-thumb').forEach(thumb=>{
+      if(thumb.querySelector('.mb5-twitch-preview'))return;
+      thumb.innerHTML='<div class="mb5-twitch-preview"><div class="play">▶</div><strong>TWITCH HIGHLIGHT</strong><span>CLICK TO PLAY ON TWITCH ↗</span></div>';
+    });
+  }
+
+  const mainGrid=document.getElementById('highlightGrid');
+  if(mainGrid){
+    const observer=new MutationObserver(fixMainHighlightPreviews);
+    observer.observe(mainGrid,{childList:true,subtree:true});
+    setTimeout(fixMainHighlightPreviews,0);
+    setTimeout(fixMainHighlightPreviews,800);
+    setTimeout(fixMainHighlightPreviews,1800);
   }
 
   async function loadHalloweenClips(){
