@@ -65,27 +65,21 @@
     .halloween-live-dot{display:inline-block;width:8px;height:8px;margin-right:8px;border-radius:50%;background:#ff3548;box-shadow:0 0 12px #ff3548}
     .halloween-clip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     .halloween-clip-card{display:block;overflow:hidden;border:1px solid #3b2417;border-radius:14px;background:#06080bee;color:#fff;text-decoration:none}
-    .halloween-clip-media{position:relative;width:100%;aspect-ratio:16/9;background:radial-gradient(circle at 50% 50%,#562100,#090909 72%);overflow:hidden}
-    .halloween-clip-media img,.halloween-clip-media iframe{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;object-fit:cover}
+    .halloween-clip-media{position:relative;width:100%;aspect-ratio:16/9;background:radial-gradient(circle at 50% 40%,#6d2500 0,#241108 38%,#090909 78%);overflow:hidden}
+    .halloween-clip-media img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+    .halloween-clip-preview{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#ff5a0014,#0000 45%),repeating-linear-gradient(135deg,#ffffff05 0 1px,transparent 1px 10px)}
+    .halloween-clip-play{display:grid;place-items:center;width:62px;height:62px;border:2px solid #ff7a1a;border-radius:50%;background:#090909cc;box-shadow:0 0 28px #ff5a0055;font-size:24px;padding-left:4px}
+    .halloween-clip-preview strong{font-size:12px;letter-spacing:.12em}.halloween-clip-preview span{color:#ff9c58;font-size:10px;font-weight:900;letter-spacing:.14em}
     .halloween-clip-body{padding:12px}.halloween-clip-body small{color:#ff7a1a;font-weight:900;letter-spacing:.08em}.halloween-clip-body b{display:block;margin-top:5px;font-size:13px;line-height:1.3}.halloween-clip-body p{margin:6px 0 0;color:#bdb4ab;font-size:11px;line-height:1.35}
     .halloween-watch{display:inline-block;margin-top:9px;color:#ff7a1a;text-decoration:none;font-size:10px;font-weight:900;letter-spacing:.04em}
     .halloween-empty{grid-column:1/-1;padding:14px;border:1px dashed #5b2a12;border-radius:14px;color:#bdb4ab;background:#06080b99;font-size:12px}
     @media(max-width:700px){.halloween-media-head,.halloween-stream-card{align-items:flex-start;flex-direction:column}.halloween-clip-grid{grid-template-columns:1fr}.halloween-available strong{font-size:clamp(28px,10vw,42px)}}`;
   document.head.appendChild(style);
 
-  const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
-  const parentHost=(location.hostname&&location.hostname!=='localhost')?location.hostname:'markbeen5.com';
-  const twitchClipSlug=url=>{
-    const s=String(url||'');
-    let m=s.match(/twitch\.tv\/[^/]+\/clip\/([^/?#]+)/i);
-    if(!m)m=s.match(/clips\.twitch\.tv\/([^/?#]+)/i);
-    return m?m[1]:'';
-  };
+  const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[ch]));
   const clipMedia=x=>{
     if(x.thumbnail_url)return `<div class="halloween-clip-media"><img src="${esc(x.thumbnail_url)}" alt="${esc(x.title||'Halloween clip')}" loading="lazy" decoding="async"></div>`;
-    const slug=twitchClipSlug(x.url);
-    if(slug)return `<div class="halloween-clip-media"><iframe src="https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&parent=${encodeURIComponent(parentHost)}&autoplay=false&muted=true" title="${esc(x.title||'Halloween highlight')}" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`;
-    return '<div class="halloween-clip-media"></div>';
+    return `<div class="halloween-clip-media"><a class="halloween-clip-preview" href="${esc(x.url||'https://www.twitch.tv/markbeen5/clips')}" target="_blank" rel="noopener" aria-label="Play ${esc(x.title||'Halloween highlight')} on Twitch"><div class="halloween-clip-play">▶</div><strong>TWITCH HIGHLIGHT</strong><span>PLAY ON TWITCH ↗</span></a></div>`;
   };
 
   function paintHalloweenClips(items){
