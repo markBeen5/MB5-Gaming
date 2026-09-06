@@ -65,13 +65,28 @@
     .halloween-live-dot{display:inline-block;width:8px;height:8px;margin-right:8px;border-radius:50%;background:#ff3548;box-shadow:0 0 12px #ff3548}
     .halloween-clip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     .halloween-clip-card{display:block;overflow:hidden;border:1px solid #3b2417;border-radius:14px;background:#06080bee;color:#fff;text-decoration:none}
-    .halloween-clip-card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#111}
+    .halloween-clip-media{position:relative;width:100%;aspect-ratio:16/9;background:radial-gradient(circle at 50% 50%,#562100,#090909 72%);overflow:hidden}
+    .halloween-clip-media img,.halloween-clip-media iframe{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;object-fit:cover}
     .halloween-clip-body{padding:12px}.halloween-clip-body small{color:#ff7a1a;font-weight:900;letter-spacing:.08em}.halloween-clip-body b{display:block;margin-top:5px;font-size:13px;line-height:1.3}.halloween-clip-body p{margin:6px 0 0;color:#bdb4ab;font-size:11px;line-height:1.35}
+    .halloween-watch{display:inline-block;margin-top:9px;color:#ff7a1a;text-decoration:none;font-size:10px;font-weight:900;letter-spacing:.04em}
     .halloween-empty{grid-column:1/-1;padding:14px;border:1px dashed #5b2a12;border-radius:14px;color:#bdb4ab;background:#06080b99;font-size:12px}
     @media(max-width:700px){.halloween-media-head,.halloween-stream-card{align-items:flex-start;flex-direction:column}.halloween-clip-grid{grid-template-columns:1fr}.halloween-available strong{font-size:clamp(28px,10vw,42px)}}`;
   document.head.appendChild(style);
 
   const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+  const parentHost=(location.hostname&&location.hostname!=='localhost')?location.hostname:'markbeen5.com';
+  const twitchClipSlug=url=>{
+    const s=String(url||'');
+    let m=s.match(/twitch\.tv\/[^/]+\/clip\/([^/?#]+)/i);
+    if(!m)m=s.match(/clips\.twitch\.tv\/([^/?#]+)/i);
+    return m?m[1]:'';
+  };
+  const clipMedia=x=>{
+    if(x.thumbnail_url)return `<div class="halloween-clip-media"><img src="${esc(x.thumbnail_url)}" alt="${esc(x.title||'Halloween clip')}" loading="lazy" decoding="async"></div>`;
+    const slug=twitchClipSlug(x.url);
+    if(slug)return `<div class="halloween-clip-media"><iframe src="https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&parent=${encodeURIComponent(parentHost)}&autoplay=false&muted=true" title="${esc(x.title||'Halloween highlight')}" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`;
+    return '<div class="halloween-clip-media"></div>';
+  };
 
   function paintHalloweenClips(items){
     const grid=document.getElementById('halloweenClipGrid');
@@ -80,7 +95,7 @@
       const hay=[x.game,x.title,x.description,x.category].filter(Boolean).join(' ').toLowerCase();
       return hay.includes('halloween');
     }).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).slice(0,4);
-    grid.innerHTML=clips.length?clips.map(x=>`<a class="halloween-clip-card" href="${esc(x.url||'https://www.twitch.tv/markbeen5/clips')}" target="_blank" rel="noopener">${x.thumbnail_url?`<img src="${esc(x.thumbnail_url)}" alt="${esc(x.title||'Halloween clip')}" loading="lazy" decoding="async">`:''}<div class="halloween-clip-body"><small>${esc((x.platform||'CLIP').toUpperCase())}</small><b>${esc(x.title||'Halloween: The Game highlight')}</b><p>${esc(x.description||'Watch this MB5 Halloween highlight.')}</p><span style="display:inline-block;margin-top:9px;color:#ff7a1a;font-size:10px;font-weight:900">WATCH HIGHLIGHT ↗</span></div></a>`).join(''):`<article class="halloween-empty">No Halloween clips are posted in the MB5 highlight feed yet. <a href="https://www.twitch.tv/markbeen5/clips" target="_blank" rel="noopener" style="color:#ff7a1a">Open MarkBeen5's Twitch clips ↗</a></article>`;
+    grid.innerHTML=clips.length?clips.map(x=>`<article class="halloween-clip-card">${clipMedia(x)}<div class="halloween-clip-body"><small>${esc((x.game||'HALLOWEEN: THE GAME').toUpperCase())} • ${esc((x.platform||'CLIP').toUpperCase())}</small><b>${esc(x.title||'Halloween: The Game highlight')}</b><p>${esc(x.description||'Watch this MB5 Halloween highlight.')}</p><a class="halloween-watch" href="${esc(x.url||'https://www.twitch.tv/markbeen5/clips')}" target="_blank" rel="noopener">WATCH HIGHLIGHT ↗</a></div></article>`).join(''):`<article class="halloween-empty">No Halloween clips are posted in the MB5 highlight feed yet. <a href="https://www.twitch.tv/markbeen5/clips" target="_blank" rel="noopener" style="color:#ff7a1a">Open MarkBeen5's Twitch clips ↗</a></article>`;
   }
 
   async function loadHalloweenClips(){
