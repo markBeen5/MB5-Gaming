@@ -68,6 +68,7 @@
       .halloween-clip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
       .halloween-clip-card{display:block;overflow:hidden;border:1px solid #3b2417;border-radius:14px;background:#06080bee;color:#fff;text-decoration:none}
       .halloween-clip-media{position:relative;width:100%;aspect-ratio:16/9;background:#090909;overflow:hidden}
+      .halloween-clip-media iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
       .halloween-clip-media img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
       .halloween-clip-preview{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#ff5a0014,#0000 45%),repeating-linear-gradient(135deg,#ffffff05 0 1px,transparent 1px 10px)}
       .halloween-clip-play{display:grid;place-items:center;width:62px;height:62px;border:2px solid #ff7a1a;border-radius:50%;background:#090909cc;box-shadow:0 0 28px #ff5a0055;font-size:24px;padding-left:4px}
@@ -89,7 +90,19 @@
   }
 
   const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+  const twitchClipSlug=url=>{
+    const value=String(url||'').trim();
+    let match=value.match(/clips\.twitch\.tv\/([A-Za-z0-9_-]+)/i);
+    if(match)return match[1];
+    match=value.match(/twitch\.tv\/[^/]+\/clip\/([A-Za-z0-9_-]+)/i);
+    return match?match[1]:'';
+  };
   const clipMedia=x=>{
+    const slug=twitchClipSlug(x.url);
+    if(slug){
+      const src=`https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&parent=markbeen5.com&parent=www.markbeen5.com&autoplay=false`;
+      return `<div class="halloween-clip-media"><iframe src="${src}" title="${esc(x.title||'Halloween Twitch highlight')}" allowfullscreen="true" scrolling="no" allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin" loading="lazy"></iframe></div>`;
+    }
     if(x.thumbnail_url)return `<div class="halloween-clip-media"><img src="${esc(x.thumbnail_url)}" alt="${esc(x.title||'Halloween clip')}" loading="lazy" decoding="async"></div>`;
     return `<div class="halloween-clip-media"><a class="halloween-clip-preview" href="${esc(x.url||'https://www.twitch.tv/markbeen5/clips')}" target="_blank" rel="noopener"><div class="halloween-clip-play">▶</div><strong>TWITCH HIGHLIGHT</strong><span>PLAY ON TWITCH ↗</span></a></div>`;
   };
