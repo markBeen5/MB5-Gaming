@@ -113,7 +113,7 @@
     const clips=(items||[]).filter(x=>x&&x.enabled!==false).filter(x=>{
       const hay=[x.game,x.title,x.description,x.category].filter(Boolean).join(' ').toLowerCase();
       return hay.includes('halloween');
-    }).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).slice(0,4);
+    }).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
     grid.innerHTML=clips.length?clips.map(x=>`<article class="halloween-clip-card">${clipMedia(x)}<div class="halloween-clip-body"><small>${esc((x.game||'HALLOWEEN: THE GAME').toUpperCase())} • ${esc((x.platform||'CLIP').toUpperCase())}</small><b>${esc(x.title||'Halloween: The Game highlight')}</b><p>${esc(x.description||'Watch this MB5 Halloween highlight.')}</p><a class="halloween-watch" href="${esc(x.url||'https://www.twitch.tv/markbeen5/clips')}" target="_blank" rel="noopener">WATCH HIGHLIGHT ↗</a></div></article>`).join(''):`<article class="halloween-empty">No Halloween clips are posted in the MB5 highlight feed yet. <a href="https://www.twitch.tv/markbeen5/clips" target="_blank" rel="noopener" style="color:#ff7a1a">Open MarkBeen5's Twitch clips ↗</a></article>`;
   }
 
