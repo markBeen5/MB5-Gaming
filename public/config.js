@@ -44,5 +44,24 @@ window.MARKBEEN5_CONFIG = {
       js('madden-dashboard.js?v=20260904-2'); js('madden-opponent-intel.js?v=20260904-1'); js('madden-results-tools.js?v=20260904-2'); js('madden-mode-insights.js?v=20260904-1'); js('madden-season-records.js?v=20260904-1'); js('madden-season-story.js?v=20260904-1'); js('madden-season-timeline.js?v=20260904-1'); js('madden-playoff-rivalry.js?v=20260904-1'); js('madden-championship-archive.js?v=20260904-1'); js('madden-season-awards.js?v=20260904-1'); js('madden-results-navigation.js?v=20260904-2'); js('madden-share-export.js?v=20260904-1');
     }
   }
+
+  // Keep the Twitch live state fresh after the page has already loaded.
+  // app.js defines refreshLive(); this calls it immediately on load,
+  // every 60 seconds, and whenever the visitor returns to the tab/window.
+  if (home) {
+    const refreshTwitchLive = () => {
+      if (typeof window.refreshLive === 'function') window.refreshLive();
+      else if (typeof refreshLive === 'function') refreshLive();
+    };
+    window.addEventListener('load', () => {
+      refreshTwitchLive();
+      window.setInterval(refreshTwitchLive, 60000);
+    });
+    window.addEventListener('focus', refreshTwitchLive);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshTwitchLive();
+    });
+  }
+
   js('analytics-loader.js?v=20260831-1');
 })();
