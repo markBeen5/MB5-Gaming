@@ -90,13 +90,16 @@ async function main() {
     return;
   }
 
-  const { data: maxOrderRows, error: orderError } = await supabase
+  // Main highlight grid sorts by sort_order ascending. Give automatic Halloween
+  // clips negative sort positions so the newest synced highlights appear in the
+  // visible highlight boxes instead of being appended behind older clips.
+  const { data: firstOrderRows, error: orderError } = await supabase
     .from('clips')
     .select('sort_order')
-    .order('sort_order', { ascending: false })
+    .order('sort_order', { ascending: true })
     .limit(1);
   if (orderError) throw orderError;
-  let nextOrder = Number(maxOrderRows?.[0]?.sort_order ?? 0) + 10;
+  let nextOrder = Math.min(Number(firstOrderRows?.[0]?.sort_order ?? 0), 0) - (newClips.length * 10);
 
   const rows = newClips
     .sort((a,b) => new Date(a.created_at) - new Date(b.created_at))
@@ -110,8 +113,8 @@ async function main() {
         description: `Twitch highlight from MarkBeen5${gameName ? ` • ${gameName}` : ''}`,
         published_at: c.created_at || null,
         game: isHalloweenText(gameName) ? gameName : 'Halloween: The Game',
-        category: 'Highlight',
-        featured: false,
+        category: 'Halloween',
+        featured: true,
         enabled: true,
         sort_order: nextOrder
       };
@@ -134,7 +137,7 @@ async function main() {
     }, { onConflict: 'platform' });
   if (connectionError) console.warn('Could not update platform_connections:', connectionError.message);
 
-  console.log(`Halloween sync complete: ${halloweenClips.length} matched, ${rows.length} new clip(s) added.`);
+  console.log(`Halloween sync complete: ${halloweenClips.length} matched, ${rows.length} new featured clip(s) added to the main highlights.`);
 }
 
 main().catch(err => {
