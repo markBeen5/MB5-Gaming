@@ -9,20 +9,20 @@
   if(release){
     release.id='halloweenAvailable';
     release.className='halloween-available';
-    release.innerHTML='<strong>NOW AVAILABLE</strong><span>DELUXE EARLY ACCESS IS LIVE • ENTER HADDONFIELD NOW</span>';
+    release.innerHTML='<strong>NOW AVAILABLE</strong><span>PATCH 1.1.0 LIVE • OCTOBER 27 CONTENT DROP NEXT</span>';
   }
 
   const copy=hq.querySelector('.halloween-copy');
-  if(copy)copy.textContent='Halloween: The Game is now available. Watch MarkBeen5 enter Haddonfield, then catch the latest Halloween streams and clips below.';
+  if(copy)copy.textContent='Halloween: The Game is live. Patch 1.1.0 is out now, with the Tower Farm and the first major post-launch content drop arriving October 27.';
 
   const kicker=hq.querySelector('.halloween-kicker');
-  if(kicker)kicker.textContent='MB5 • HALLOWEEN: THE GAME • NOW PLAYING';
+  if(kicker)kicker.textContent='MB5 • HALLOWEEN: THE GAME • OCTOBER UPDATE';
 
   const meta=hq.querySelector('.halloween-meta');
   if(meta){
     [...meta.querySelectorAll('span')].forEach(el=>{
       if(el.textContent.trim()==='DELUXE PRE-ORDER')el.textContent='NOW AVAILABLE';
-      if(el.textContent.trim()==='EARLY ACCESS')el.textContent='LIVE NOW';
+      if(el.textContent.trim()==='EARLY ACCESS')el.textContent='PATCH 1.1.0';
     });
   }
 
