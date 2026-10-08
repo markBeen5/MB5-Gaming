@@ -9,6 +9,16 @@
     nav.insertBefore(link, admin || null);
   }
 
+  function addHellraiserNav() {
+    const nav = document.querySelector('.nav-links');
+    if (!nav || nav.querySelector('a[href="hellraiser-revival.html"]')) return;
+    const link = document.createElement('a');
+    link.href = 'hellraiser-revival.html';
+    link.textContent = 'HELLRAISER';
+    const admin = nav.querySelector('.admin-link');
+    nav.insertBefore(link, admin || null);
+  }
+
   function improveQuickNav() {
     const quick = document.querySelector('.mobile-quick');
     if (!quick || quick.querySelector('a[href="news.html"]')) return;
@@ -22,10 +32,12 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       addGtaNav();
+      addHellraiserNav();
       improveQuickNav();
     });
   } else {
     addGtaNav();
+    addHellraiserNav();
     improveQuickNav();
   }
 })();
