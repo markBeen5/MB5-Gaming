@@ -91,10 +91,8 @@ async function main() {
   if (!user) throw new Error(`Twitch user not found: ${TWITCH_LOGIN}`);
 
   const clips = await getAllBroadcasterClips(user.id, token);
-  if (!clips.length) {
-    console.log('No Twitch clips found.');
-    return;
-  }
+  const videos = (await helix(`/videos?user_id=${encodeURIComponent(user.id)}&type=archive&first=100`, token)).data || [];
+  for (const v of videos) clips.push({url:v.url,title:v.title,created_at:v.created_at,thumbnail_url:(v.thumbnail_url||'').replace('%{width}','640').replace('%{height}','360'),isArchive:true});
 
   const gameIds = [...new Set(clips.map(c => c.game_id).filter(Boolean))];
   const gameNames = new Map();
@@ -104,39 +102,31 @@ async function main() {
     for (const g of games.data || []) gameNames.set(g.id, g.name || '');
   }
 
-  const halloweenClips = clips.filter(c => {
-    const gameName = gameNames.get(c.game_id) || '';
-    return isHalloweenText(gameName) || isHalloweenText(c.title);
-  });
-
-  if (!halloweenClips.length) {
-    console.log(`Scanned ${clips.length} Twitch clips; no Halloween clips found.`);
-    return;
-  }
+  const halloweenClips = clips.filter(c => c.url);
+  if (!halloweenClips.length) return;
 
   const urls = halloweenClips.map(c => c.url).filter(Boolean);
-  const { data: existing, error: existingError } = await supabase
-    .from('clips')
-    .select('url')
-    .in('url', urls);
-  if (existingError) throw existingError;
-
-  const existingUrls = new Set((existing || []).map(x => x.url));
+  const existingUrls = new Set();
+  for (let i=0;i<urls.length;i+=50) {
+    const {data,error}=await supabase.from('clips').select('url').in('url',urls.slice(i,i+50));
+    if(error) throw error;
+    for(const row of data||[]) existingUrls.add(row.url);
+  }
   const newClips = halloweenClips.filter(c => !existingUrls.has(c.url));
 
   if (newClips.length) {
     const rows = newClips.map(c => {
-      const gameName = gameNames.get(c.game_id) || 'Halloween: The Game';
+      const gameName = gameNames.get(c.game_id) || (c.isArchive ? 'Past Broadcasts' : 'Twitch');
       return {
         platform: 'Twitch',
-        title: c.title || 'Halloween Highlight',
+        title: c.title || 'Twitch Highlight',
         url: c.url,
         thumbnail_url: c.thumbnail_url || null,
         description: `Twitch highlight from MarkBeen5${gameName ? ` • ${gameName}` : ''}`,
         published_at: c.created_at || null,
-        game: isHalloweenText(gameName) ? gameName : 'Halloween: The Game',
-        category: 'Halloween',
-        featured: true,
+        game: gameName,
+        category: c.isArchive ? 'Past Broadcasts' : (isHalloweenText(gameName) ? 'Halloween' : gameName),
+        featured: !c.isArchive && isHalloweenText(gameName),
         enabled: true,
         sort_order: 9999
       };
@@ -157,7 +147,7 @@ async function main() {
       channel_handle: `@${TWITCH_LOGIN}`,
       last_sync_at: now,
       metadata: {
-        last_halloween_sync_at: now,
+        last_all_twitch_sync_at: now,
         scanned_count: clips.length,
         matched_count: halloweenClips.length,
         imported_count: newClips.length,
@@ -166,7 +156,7 @@ async function main() {
     }, { onConflict: 'platform' });
   if (connectionError) console.warn('Could not update platform_connections:', connectionError.message);
 
-  console.log(`Halloween sync complete: scanned ${clips.length}, matched ${halloweenClips.length}, imported ${newClips.length}, ordered ${orderedCount}.`);
+  console.log(`Twitch media sync complete: scanned ${clips.length}, matched ${halloweenClips.length}, imported ${newClips.length}, ordered ${orderedCount}.`);
 }
 
 main().catch(err => {
